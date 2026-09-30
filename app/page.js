@@ -1,137 +1,25 @@
-const categories = [
-  ["🚗","Marketplace","Carros novos e usados em toda a Suíça","/marketplace"],
-  ["🔧","Peças","Peças novas, usadas e fornecedores","/pecas"],
-  ["🛞","Rodas e pneus","Pneus, rodas e conjuntos completos","/pneus"],
-  ["🏁","Oficinas","Mecânicas, carrocerias e especialistas","/oficinas"],
-  ["♻️","Desmanches","Auto-recycling e peças usadas","/desmanches"],
-  ["📅","Eventos","Encontros e eventos automotivos","/eventos"],
-  ["📰","Revista","Notícias, lançamentos e guias","/revista"],
-  ["📚","Ficha técnica","Marcas, modelos e especificações","/fichas"],
-  ["▶️","Vídeos","Tutoriais, reviews e diagnóstico por idioma","/videos"],
-  ["📱","Apps","Aplicativos úteis para motoristas","/apps"],
-  ["❤️","Minha garagem","Favoritos, veículos e diagnósticos","/garagem"]
+const categories=[
+["🚘","Comprar carros","Novos, usados, clássicos e oportunidades","/marketplace"],
+["🔁","Trocar veículo","Encontre anúncios que aceitam troca","/marketplace"],
+["🧠","Diagnóstico IA","Investigue barulhos, falhas e sintomas","/diagnostico"],
+["⚙️","Peças","Novas, usadas e fornecedores suíços","/pecas"],
+["🛞","Pneus & rodas","Lojas, ofertas e serviços","/pneus"],
+["🔧","Oficinas","Mecânicas, especialistas e carrocerias","/oficinas"],
+["♻️","Desmanches","Auto-recycling e peças usadas","/desmanches"],
+["🏁","Eventos","Encontros e eventos automotivos","/eventos"]
 ];
-
-const highlights = [
-  ["Busca inteligente","Pesquise por marca, modelo, preço, MFK, combustível e região."],
-  ["Diagnóstico do carro","Descreva barulho, falha ou sintoma e veja causas possíveis."],
-  ["Tudo em um só lugar","Carros, peças, pneus, oficinas, eventos e conteúdo automotivo."]
+const news=[
+["REVISTA","Mundo automotivo sem fronteiras","Europa, China, Japão, EUA, lançamentos, tecnologia e mercado.","/revista"],
+["FICHA TÉCNICA","Descubra qualquer carro","Marca, modelo, geração, motor, potência, consumo e dimensões.","/fichas"],
+["VÍDEOS","Aprenda e descubra","Reviews, manutenção, diagnóstico e conteúdo no seu idioma.","/videos"]
 ];
-
-export default function Home() {
-  return <main>
-    <header className="top">
-      <a className="brand brandLink" href="/">TOTAL <b>CARS</b><span>.CH</span></a>
-      <nav>
-        <a href="/marketplace">Comprar</a>
-        <a href="/diagnostico">Diagnóstico IA</a>
-        <a href="/pecas">Peças</a>
-        <a href="/oficinas">Oficinas</a>
-        <a href="/revista">Revista</a>
-        <a href="/fichas">Ficha técnica</a>
-        <a href="/eventos">Eventos</a>
-        <a className="navButton" href="/anunciar">ANUNCIAR GRÁTIS</a>
-      </nav>
-    </header>
-
-    <section className="hero" id="buscar">
-      <div className="heroText">
-        <p className="eyebrow">SUÍÇA • EUROPA • MUNDO AUTOMOTIVO</p>
-        <h1>Seu carro. Seu mundo. Tudo em um só lugar.</h1>
-        <p>Compre, venda ou troque carros, encontre peças e oficinas, descubra eventos, consulte fichas técnicas e investigue defeitos com o Diagnóstico Total Cars.</p>
-
-        <div className="search">
-          <select defaultValue="">
-            <option value="" disabled>Marca</option>
-            <option>Audi</option><option>BMW</option><option>Mercedes-Benz</option>
-            <option>Volkswagen</option><option>Volvo</option><option>Toyota</option>
-          </select>
-          <input placeholder="Modelo, peça ou palavra-chave"/>
-          <select defaultValue="">
-            <option value="" disabled>Preço máximo</option>
-            <option>CHF 2'500</option><option>CHF 5'000</option>
-            <option>CHF 10'000</option><option>CHF 25'000</option>
-          </select>
-          <button>Pesquisar</button>
-        </div>
-
-        <div className="quick">
-          <span>🔥 Até CHF 2'500</span>
-          <span>✓ Com MFK</span>
-          <span>⚡ Recém-anunciados</span>
-          <span>🔁 Aceita troca</span>
-        </div>
-
-        <a className="diagnosticHero" href="/diagnostico">
-          <b>🔧 Encontre o diagnóstico do seu carro aqui</b>
-          <small>Descreva o problema e receba uma análise inteligente →</small>
-        </a>
-      </div>
-
-      <div className="carCard">
-        <div className="car">🏎️</div>
-        <b>COMPRE • VENDA • TROQUE</b>
-        <small>Total Cars Switzerland</small>
-      </div>
-    </section>
-
-    <section className="trustStrip">
-      {highlights.map(([t,d]) => <div key={t}><b>{t}</b><span>{d}</span></div>)}
-    </section>
-
-    <section className="section" id="categorias">
-      <p className="eyebrow">EXPLORE</p>
-      <h2>Tudo para quem gosta de carros</h2>
-      <div className="grid">
-        {categories.map(([i,t,d,href]) => <article key={t}>
-          <div className="icon">{i}</div>
-          <h3>{t}</h3>
-          <p>{d}</p>
-          <a href={href}>Explorar →</a>
-        </article>)}
-      </div>
-    </section>
-
-    <section className="featureBand">
-      <div>
-        <p className="eyebrow">NOVIDADE</p>
-        <h2>Diagnóstico inteligente para problemas do carro</h2>
-        <p>Barulho na partida? Suspensão estalando? Ventoinha ligada? Descreva o sintoma e receba hipóteses, testes simples e próximos passos.</p>
-        <a className="buttonLink" href="/diagnostico">Testar diagnóstico</a>
-      </div>
-      <div className="featureVisual">🧠🔧🚗</div>
-    </section>
-
-    <section className="section">
-      <p className="eyebrow">CONTEÚDO</p>
-      <h2>Revista, lançamentos e ficha técnica</h2>
-      <div className="editorialGrid">
-        <a href="/revista" className="editorialCard">
-          <span>REVISTA TOTAL CARS</span>
-          <h3>Uma revista automotiva realmente global</h3>
-          <p>Europa, China, Japão, EUA e novas marcas: lançamentos, supercarros, elétricos, tecnologia, indústria, clássicos, preparação e mercado.</p>
-        </a>
-        <a href="/fichas" className="editorialCard">
-          <span>BASE TÉCNICA</span>
-          <h3>Enciclopédia técnica de carros por marca e modelo</h3>
-          <p>Marca → modelo → geração → motor → versão, com potência, torque, consumo, transmissão, dimensões, desempenho e dados técnicos.</p>
-        </a>
-      </div>
-    </section>
-
-    <section className="cta">
-      <div>
-        <p className="eyebrow">PARA VENDEDORES</p>
-        <h2>Tem um carro para vender?</h2>
-        <p>Crie seu anúncio e alcance compradores em toda a Suíça.</p>
-      </div>
-      <a className="buttonLink" href="/anunciar">Anunciar meu carro</a>
-    </section>
-
-    <footer>
-      <div className="brand">TOTAL <b>CARS</b><span>.CH</span></div>
-      <p>O portal automotivo feito para a Suíça.</p>
-      <small>© 2026 Total Cars Switzerland</small>
-    </footer>
-  </main>
-}
+export default function Home(){return <main className="tc">
+<header className="premiumTop"><a className="premiumLogo" href="/"><span>TOTAL</span> CARS<em>.CH</em></a><nav><a href="/marketplace">CARROS</a><a href="/pecas">PEÇAS</a><a href="/oficinas">OFICINAS</a><a href="/revista">REVISTA</a><a href="/fichas">FICHAS</a><a href="/eventos">EVENTOS</a></nav><div className="topActions"><a href="/garagem">♡ GARAGEM</a><a className="sellBtn" href="/anunciar">+ ANUNCIAR</a></div></header>
+<section className="premiumHero"><div className="heroShade"></div><div className="premiumHeroContent"><span className="heroKicker">TOTAL CARS SWITZERLAND</span><h1>O MUNDO DO<br/><i>AUTOMÓVEL</i><br/>EM UM SÓ LUGAR.</h1><p>Comprar. Vender. Trocar. Descobrir. Resolver.</p><div className="premiumSearch"><select defaultValue=""><option value="" disabled>Marca</option><option>Audi</option><option>BMW</option><option>Mercedes-Benz</option><option>Porsche</option><option>Volkswagen</option><option>Toyota</option></select><input placeholder="Modelo ou palavra-chave"/><select defaultValue=""><option value="" disabled>Preço até</option><option>CHF 5'000</option><option>CHF 10'000</option><option>CHF 25'000</option><option>CHF 50'000+</option></select><a href="/marketplace">BUSCAR</a></div><div className="heroLinks"><a href="/marketplace">🔥 Ofertas</a><a href="/marketplace">✓ Com MFK</a><a href="/marketplace">↔ Aceita troca</a></div></div><a className="aiFloat" href="/diagnostico"><span>AI</span><div><b>DIAGNÓSTICO TOTAL CARS</b><small>Conte o problema do seu carro →</small></div></a></section>
+<section className="darkStats"><div><strong>01</strong><span>CARROS<br/>Marketplace suíço</span></div><div><strong>02</strong><span>GARAGEM<br/>Serviços e peças</span></div><div><strong>03</strong><span>CONTEÚDO<br/>Revista global</span></div><div><strong>04</strong><span>INTELIGÊNCIA<br/>Diagnóstico IA</span></div></section>
+<section className="premiumSection"><div className="sectionHead"><div><span>EXPLORE TOTAL CARS</span><h2>Tudo que seu carro precisa.</h2></div><a href="/marketplace">VER MARKETPLACE →</a></div><div className="premiumGrid">{categories.map(([i,t,d,h],n)=><a href={h} className={"premiumTile tile"+n} key={t}><span className="tileNo">0{n+1}</span><div className="tileIcon">{i}</div><h3>{t}</h3><p>{d}</p><b>EXPLORAR →</b></a>)}</div></section>
+<section className="aiBand"><div><span className="heroKicker">TOTAL CARS INTELLIGENCE</span><h2>Seu carro fala.<br/>A gente ajuda você a entender.</h2><p>Descreva o barulho, falha ou comportamento. Organize possibilidades, verificações iniciais e encontre conteúdo relacionado.</p><a href="/diagnostico">ABRIR DIAGNÓSTICO →</a></div><div className="aiOrb"><span>TC</span><b>AI</b></div></section>
+<section className="premiumSection editorial"><div className="sectionHead"><div><span>TOTAL CARS MEDIA</span><h2>Mais que classificados.</h2></div></div><div className="newsGrid">{news.map(([k,t,d,h],n)=><a href={h} key={t} className={"newsCard news"+n}><small>{k}</small><h3>{t}</h3><p>{d}</p><b>DESCOBRIR →</b></a>)}</div></section>
+<section className="sellBand"><div><small>VENDA SEU CARRO</small><h2>Seu próximo negócio começa aqui.</h2><p>Anuncie para compradores em toda a Suíça.</p></div><a href="/anunciar">ANUNCIAR GRÁTIS →</a></section>
+<footer className="premiumFooter"><div className="premiumLogo"><span>TOTAL</span> CARS<em>.CH</em></div><div>Marketplace · Peças · Oficinas · Revista · Fichas · Eventos</div><small>© 2026 Total Cars Switzerland</small></footer>
+</main>}
