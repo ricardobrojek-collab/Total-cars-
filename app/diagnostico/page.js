@@ -1,9 +1,44 @@
-"use client";import {useEffect,useState} from "react";
-const rules=[
-{k:["mola","traseira","quebrou"],a:"Entendi: você relata uma mola traseira quebrada no Audi A6 3.0. Se a mola está realmente partida, evite rodar além do necessário: a altura e o comportamento do carro podem mudar e a ponta quebrada pode causar outros danos. O próximo passo é confirmar qual suspensão/eixo e a geração do A6 para identificar a peça correta. Também vale inspecionar a mola do outro lado, amortecedor, batentes e apoios.",videoId:"kTzNzU5HQsU",videoTitle:"Audi A6 C7 — troca de molas e amortecedores traseiros"},
-{k:["partida","clec","arranque"],a:"Esse tipo de ruído na partida pode envolver bateria/motor de arranque, tensor ou acessórios e, dependendo do motor, lubrificação. Confira nível do óleo e diga se acontece frio ou quente e por quantos segundos."},
-{k:["ventoinha","ventilador"],a:"A ventoinha após desligar pode ser normal em algumas condições, inclusive regeneração de DPF em diesel. Informe temperatura, duração e se há luz de avaria."},
-{k:["suspensão","estalo","batida"],a:"Estalos na suspensão podem vir de bieletas, buchas, braços, mola ou amortecedor. Diga se ocorre em lombada, esterçando ou também em piso plano."}
-];
-const welcome={role:"ai",text:"Olá! Sou o Diagnóstico Total Cars. Informe marca, modelo, ano, motor e descreva o sintoma. Vamos investigar por etapas."};
-export default function Diagnostico(){const [input,setInput]=useState("");const [msgs,setMsgs]=useState([welcome]);useEffect(()=>{try{const x=JSON.parse(localStorage.getItem("tc_diag")||"null");if(x?.length)setMsgs(x)}catch{}},[]);useEffect(()=>{try{localStorage.setItem("tc_diag",JSON.stringify(msgs))}catch{}},[msgs]);function send(){if(!input.trim())return;const q=input.trim();const r=rules.find(x=>x.k.some(k=>q.toLowerCase().includes(k)));const a=r?.a||"Entendi. Para restringir as possibilidades, me diga quando acontece, se há luz no painel, ruído, vibração, cheiro ou vazamento. Inclua também marca, modelo, ano e motor.";setMsgs(m=>[...m,{role:"user",text:q},{role:"ai",text:a,videoId:r?.videoId||null,videoTitle:r?.videoTitle||null}]);setInput("")}return <main className="chatPage"><header className="chatTop"><a href="/" className="premiumLogo"><span>TOTAL</span> CARS<em>.CH</em></a><div><span>PT</span><span>DE</span><button onClick={()=>{setMsgs([welcome]);localStorage.removeItem("tc_diag")}}>+ NOVA CONVERSA</button></div></header><div className="chatShell"><aside><b>DIAGNÓSTICO</b><p>Conversa atual</p><small>O histórico fica salvo neste navegador.</small></aside><section className="chatMain"><div className="chatTitle"><span>TC</span><div><b>Total Cars AI</b><small>Assistente de diagnóstico automotivo</small></div></div><div className="messages">{msgs.map((m,i)=><div className={"message "+m.role} key={i}><b>{m.role==="ai"?"TOTAL CARS AI":"VOCÊ"}</b><p>{m.text}</p>{m.videoId&&<div className="videoEmbed"><b>VÍDEO RELACIONADO</b><iframe src={"https://www.youtube.com/embed/"+m.videoId} title={m.videoTitle||"Vídeo relacionado"} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen/><small>{m.videoTitle}</small></div>}</div>)}</div><div className="chatInput"><textarea value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();send()}}} placeholder="Descreva o problema do seu carro..."/><button onClick={send}>ENVIAR ↑</button></div><small className="chatDisclaimer">Triagem informativa. Problemas de segurança exigem inspeção profissional.</small></section></div></main>}
+"use client";
+import {useEffect,useState} from "react";
+
+const welcome={role:"ai",text:"Olá! Sou o Total Cars AI. Informe o carro e descreva o problema. Vou acompanhar o contexto da conversa e investigar com você por etapas."};
+
+export default function Diagnostico(){
+  const [input,setInput]=useState("");
+  const [msgs,setMsgs]=useState([welcome]);
+  const [loading,setLoading]=useState(false);
+
+  useEffect(()=>{try{const x=JSON.parse(localStorage.getItem("tc_diag")||"null");if(x?.length)setMsgs(x)}catch{}},[]);
+  useEffect(()=>{try{localStorage.setItem("tc_diag",JSON.stringify(msgs))}catch{}},[msgs]);
+
+  async function send(){
+    const q=input.trim();
+    if(!q||loading)return;
+    const userMsg={role:"user",text:q};
+    const next=[...msgs,userMsg];
+    setMsgs(next); setInput(""); setLoading(true);
+    try{
+      const r=await fetch("/api/diagnostico",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:next})});
+      const data=await r.json();
+      if(!r.ok) throw new Error(data?.error||"Falha na IA");
+      setMsgs(m=>[...m,{role:"ai",text:data.text}]);
+    }catch(e){
+      setMsgs(m=>[...m,{role:"ai",text:"Não consegui falar com a IA agora. Tente novamente em alguns segundos."}]);
+    }finally{setLoading(false)}
+  }
+
+  function reset(){setMsgs([welcome]);localStorage.removeItem("tc_diag")}
+
+  return <main className="chatPage">
+    <header className="chatTop"><a href="/" className="premiumLogo"><span>TOTAL</span> CARS<em>.CH</em></a><div><span>PT</span><span>DE</span><button onClick={reset}>+ NOVA CONVERSA</button></div></header>
+    <div className="chatShell">
+      <aside><b>DIAGNÓSTICO</b><p>Conversa atual</p><small>O histórico fica salvo neste navegador.</small></aside>
+      <section className="chatMain">
+        <div className="chatTitle"><span>TC</span><div><b>Total Cars AI</b><small>Diagnóstico automotivo com GPT</small></div></div>
+        <div className="messages">{msgs.map((m,i)=><div className={"message "+m.role} key={i}><b>{m.role==="ai"?"TOTAL CARS AI":"VOCÊ"}</b><p>{m.text}</p></div>)}{loading&&<div className="message ai"><b>TOTAL CARS AI</b><p>Analisando...</p></div>}</div>
+        <div className="chatInput"><textarea value={input} disabled={loading} onChange={e=>setInput(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();send()}}} placeholder="Descreva o problema do seu carro..."/><button disabled={loading} onClick={send}>{loading?"AGUARDE...":"ENVIAR ↑"}</button></div>
+        <small className="chatDisclaimer">Triagem informativa. Problemas de segurança exigem inspeção profissional.</small>
+      </section>
+    </div>
+  </main>
+}
