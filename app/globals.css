@@ -64,3 +64,26 @@
 .photoCredit{display:none}
 @media(max-width:1250px){.refLogo{min-width:240px}.refLogo .logoWords b{font-size:25px}.premiumTop nav{gap:14px}.premiumTop nav a{font-size:9px}.photoHero h1{font-size:64px}}
 @media(max-width:900px){.premiumTop{height:82px}.refLogo{min-width:0}.refLogo .gauge,.refLogo .logoWords small{display:none}.refLogo .logoWords b{font-size:21px}.premiumTop nav{display:none}.photoHero{height:900px}.heroDock{grid-template-columns:1fr 1fr}.heroDock a:last-child{display:none}}
+
+/* FINAL approved-cover correction */
+.referenceHero{height:calc(100vh - 110px);min-height:760px;max-height:900px;background-size:cover!important;background-position:58% center!important}
+.referenceHero:after{background:linear-gradient(90deg,rgba(2,5,8,.88) 0%,rgba(2,5,8,.60) 25%,rgba(2,5,8,.08) 52%,rgba(2,5,8,.02) 100%),linear-gradient(0deg,rgba(3,6,9,.86) 0%,transparent 27%)}
+.referenceHero .premiumHeroContent{padding:58px 4vw 0;max-width:790px}
+.referenceHero .heroKicker{font-size:13px;color:#fff;letter-spacing:2px}
+.referenceHero h1{font-size:76px;line-height:.91;margin:20px 0 18px;text-shadow:0 3px 18px #000}
+.referenceHero h1 i{color:#ff2020}
+.referenceHero .premiumHeroContent>p{max-width:500px;font-size:18px;line-height:1.45;text-shadow:0 2px 10px #000}
+.heroSearchWrap{position:absolute;left:20%;right:20%;bottom:164px;z-index:12}
+.referenceHero .premiumSearch{width:100%;margin:0;grid-template-columns:1fr 1.25fr 1.15fr 210px;border-radius:10px}
+.referenceHero .premiumSearch select,.referenceHero .premiumSearch input{padding:20px;font-size:16px}
+.referenceHero .heroLinks{margin:15px 10px 0;justify-content:flex-start}
+.referenceHero .heroDock{bottom:14px}
+.referenceHero .heroDock a{min-height:104px}
+.referenceHero .heroDock .thumb{flex:0 0 78px;height:78px;font-size:0;background-size:cover;background-position:center}
+.referenceHero .heroDock .carThumb{background-image:url("https://uploads.audi.com/system/production/media/117722/images/44c10cf1e8e8d9c830feaff0a7ea977994572844/A232980_web_2880.jpg?1698535865=")}
+.referenceHero .heroDock .tireThumb{font-size:38px}.referenceHero .heroDock .tireThumb:after{content:"◉";color:#d9dde2}
+.referenceHero .heroDock .garageThumb{font-size:28px}.referenceHero .heroDock .garageThumb:after{content:"🔧"}
+.referenceHero .heroDock .magazineThumb{font-size:28px}.referenceHero .heroDock .magazineThumb:after{content:"🏎️"}
+.referenceHero .heroDock .eventThumb{font-size:28px}.referenceHero .heroDock .eventThumb:after{content:"🗓️"}
+@media(max-width:1100px){.heroSearchWrap{left:7%;right:7%}.referenceHero h1{font-size:62px}}
+@media(max-width:800px){.referenceHero{height:auto;min-height:980px}.referenceHero .premiumHeroContent{padding:55px 5vw 0}.referenceHero h1{font-size:48px}.heroSearchWrap{position:relative;left:auto;right:auto;bottom:auto;margin:35px 5vw 0}.referenceHero .premiumSearch{grid-template-columns:1fr}.referenceHero .heroDock{position:absolute}.referenceHero .heroDock .thumb{flex-basis:58px;height:58px}}
