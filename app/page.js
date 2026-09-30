@@ -6,7 +6,7 @@ const categories = [
   ["♻️","Desmanches","Auto-recycling e peças usadas","/desmanches"],
   ["📅","Eventos","Encontros e eventos automotivos","/eventos"],
   ["📰","Revista","Notícias, lançamentos e guias","/revista"],
-  ["📚","Ficha técnica","Marcas, modelos e especificações","/fichas"]
+  ["📚","Ficha técnica","Marcas, modelos e especificações","/fichas"],\n  ["▶️","Vídeos","Tutoriais, reviews e diagnóstico por idioma","/videos"],\n  ["📱","Apps","Aplicativos úteis para motoristas","/apps"],\n  ["❤️","Minha garagem","Favoritos, veículos e diagnósticos","/garagem"]
 ];
 
 const highlights = [
@@ -25,7 +25,7 @@ export default function Home() {
         <a href="/oficinas">Oficinas</a>
         <a href="/revista">Revista</a>
         <a href="/fichas">Ficha técnica</a>
-        <button>Anunciar grátis</button>
+        <a className="navButton" href="/anunciar">ANUNCIAR</a>
       </nav>
     </header>
 
@@ -120,7 +120,7 @@ export default function Home() {
         <h2>Tem um carro para vender?</h2>
         <p>Crie seu anúncio e alcance compradores em toda a Suíça.</p>
       </div>
-      <button>Anunciar meu carro</button>
+      <a className="buttonLink" href="/anunciar">Anunciar meu carro</a>
     </section>
 
     <footer>
