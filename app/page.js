@@ -6,7 +6,10 @@ const categories = [
   ["♻️","Desmanches","Auto-recycling e peças usadas","/desmanches"],
   ["📅","Eventos","Encontros e eventos automotivos","/eventos"],
   ["📰","Revista","Notícias, lançamentos e guias","/revista"],
-  ["📚","Ficha técnica","Marcas, modelos e especificações","/fichas"],\n  ["▶️","Vídeos","Tutoriais, reviews e diagnóstico por idioma","/videos"],\n  ["📱","Apps","Aplicativos úteis para motoristas","/apps"],\n  ["❤️","Minha garagem","Favoritos, veículos e diagnósticos","/garagem"]
+  ["📚","Ficha técnica","Marcas, modelos e especificações","/fichas"],
+  ["▶️","Vídeos","Tutoriais, reviews e diagnóstico por idioma","/videos"],
+  ["📱","Apps","Aplicativos úteis para motoristas","/apps"],
+  ["❤️","Minha garagem","Favoritos, veículos e diagnósticos","/garagem"]
 ];
 
 const highlights = [
