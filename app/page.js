@@ -24,19 +24,21 @@ export default function Home() {
       <a className="brand brandLink" href="/">TOTAL <b>CARS</b><span>.CH</span></a>
       <nav>
         <a href="/marketplace">Comprar</a>
+        <a href="/diagnostico">Diagnóstico IA</a>
         <a href="/pecas">Peças</a>
         <a href="/oficinas">Oficinas</a>
         <a href="/revista">Revista</a>
         <a href="/fichas">Ficha técnica</a>
-        <a className="navButton" href="/anunciar">ANUNCIAR</a>
+        <a href="/eventos">Eventos</a>
+        <a className="navButton" href="/anunciar">ANUNCIAR GRÁTIS</a>
       </nav>
     </header>
 
     <section className="hero" id="buscar">
       <div className="heroText">
-        <p className="eyebrow">SUÍÇA • AUTOMÓVEIS • TUDO EM UM SÓ LUGAR</p>
-        <h1>O portal automotivo completo da Suíça.</h1>
-        <p>Encontre carros, peças, pneus, oficinas, eventos e informação técnica em uma experiência simples, rápida e feita para quem realmente usa carro.</p>
+        <p className="eyebrow">SUÍÇA • EUROPA • MUNDO AUTOMOTIVO</p>
+        <h1>Seu carro. Seu mundo. Tudo em um só lugar.</h1>
+        <p>Compre, venda ou troque carros, encontre peças e oficinas, descubra eventos, consulte fichas técnicas e investigue defeitos com o Diagnóstico Total Cars.</p>
 
         <div className="search">
           <select defaultValue="">
@@ -67,8 +69,8 @@ export default function Home() {
       </div>
 
       <div className="carCard">
-        <div className="car">🚘</div>
-        <b>Encontre. Compare. Dirija.</b>
+        <div className="car">🏎️</div>
+        <b>COMPRE • VENDA • TROQUE</b>
         <small>Total Cars Switzerland</small>
       </div>
     </section>
@@ -106,13 +108,13 @@ export default function Home() {
       <div className="editorialGrid">
         <a href="/revista" className="editorialCard">
           <span>REVISTA TOTAL CARS</span>
-          <h3>Notícias e lançamentos do mundo automotivo</h3>
-          <p>Matérias, tecnologia, elétricos, esportivos, mercado europeu e novidades globais.</p>
+          <h3>Uma revista automotiva realmente global</h3>
+          <p>Europa, China, Japão, EUA e novas marcas: lançamentos, supercarros, elétricos, tecnologia, indústria, clássicos, preparação e mercado.</p>
         </a>
         <a href="/fichas" className="editorialCard">
           <span>BASE TÉCNICA</span>
-          <h3>Escolha marca e modelo e consulte a ficha técnica</h3>
-          <p>Motor, potência, torque, consumo, transmissão, dimensões e outras especificações.</p>
+          <h3>Enciclopédia técnica de carros por marca e modelo</h3>
+          <p>Marca → modelo → geração → motor → versão, com potência, torque, consumo, transmissão, dimensões, desempenho e dados técnicos.</p>
         </a>
       </div>
     </section>
