@@ -87,3 +87,5 @@
 .referenceHero .heroDock .eventThumb{font-size:28px}.referenceHero .heroDock .eventThumb:after{content:"🗓️"}
 @media(max-width:1100px){.heroSearchWrap{left:7%;right:7%}.referenceHero h1{font-size:62px}}
 @media(max-width:800px){.referenceHero{height:auto;min-height:980px}.referenceHero .premiumHeroContent{padding:55px 5vw 0}.referenceHero h1{font-size:48px}.heroSearchWrap{position:relative;left:auto;right:auto;bottom:auto;margin:35px 5vw 0}.referenceHero .premiumSearch{grid-template-columns:1fr}.referenceHero .heroDock{position:absolute}.referenceHero .heroDock .thumb{flex-basis:58px;height:58px}}
+
+.magGenerated{background:radial-gradient(circle at 75% 28%,#a81818 0,transparent 28%),linear-gradient(135deg,#15191f 0%,#08090b 55%,#270505 100%);position:relative;overflow:hidden}.magGenerated:after{content:"TOTAL CARS";position:absolute;right:-35px;bottom:20px;font-size:82px;font-weight:1000;font-style:italic;color:#ffffff0c;transform:rotate(-8deg)}.sourceLink{display:inline-block;margin-top:18px;color:#ff3030;font-weight:900;text-decoration:none}
