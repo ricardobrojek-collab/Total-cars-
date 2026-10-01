@@ -1,38 +1,42 @@
 "use client";
-import {useMemo,useState} from "react";
-const data={
- Audi:{models:["A6","A4","A3","Q5","Q7"],versions:["C7 (2011–2018)","C6 (2004–2011)","C8 (2018–presente)"],motors:["3.0 TDI Quattro","2.0 TDI","3.0 TFSI"]},
- Volkswagen:{models:["Golf","Passat","Tiguan","Caddy"],versions:["Selecione a geração"],motors:["2.0 TDI","1.5 TSI","2.0 TSI"]},
- BMW:{models:["Série 3 (F30)","Série 5 (F10)","X3","X5"],versions:["Selecione a geração"],motors:["Diesel","Gasolina"]},
- "Mercedes-Benz":{models:["Classe C (W205)","Classe E (W212)","GLC","Vito"],versions:["Selecione a geração"],motors:["Diesel","Gasolina"]},
- Skoda:{models:["Octavia","Superb","Kodiaq"],versions:["Selecione a geração"],motors:["2.0 TDI","1.5 TSI"]},
- Porsche:{models:["Cayenne","Macan","Panamera"],versions:["Selecione a geração"],motors:["Gasolina","Diesel","Híbrido"]}
+import {useEffect,useRef,useState} from "react";
+
+const cars={
+"Audi":{models:["A6 / S6 / RS6","A4 / S4 / RS4","A3 / S3","Q5","Q7"],versions:["A6 C7 (2011–2018)","A6 C6 (2004–2011)","A6 C8 (2018–2024)","A4 B9 (2015–2024)","A4 B8 (2008–2015)"],motors:["3.0 TDI V6 Quattro","2.0 TDI (150/190 CV)","2.0 TFSI Turbo","3.0 TFSI Supercharged"]},
+"Volkswagen":{models:["Golf VII / VIII","Passat Variant","Tiguan","Touareg"],versions:["Golf VII (2012–2020)","Passat B8 (2014–2023)","Tiguan II (2016–2024)"],motors:["2.0 TDI (150/190 CV)","2.0 TSI GTI/R","1.4 / 1.5 TSI"]},
+"BMW":{models:["Série 3 (320d/330d)","Série 5 Touring","X3 xDrive","X5 xDrive"],versions:["G20 / G21 Touring (2019–2024)","F30 / F31 Touring (2011–2019)"],motors:["2.0d B47 (320d)","3.0d 6 Cilindros (330d/530d)","2.0 Turbo Gasolina"]},
+"Mercedes-Benz":{models:["Classe C (C220d)","Classe E Station","GLC 4MATIC"],versions:["W205 / S205 (2014–2021)","S213 (2016–2023)"],motors:["2.2 / 2.0 CDI Diesel","3.0 V6 Diesel","2.0 Turbo Gasolina"]},
+"Porsche":{models:["Macan","Cayenne","911 Carrera"],versions:["Macan II (2018–2024)","Cayenne E3 (2017–2024)"],motors:["3.0 V6 Turbo","2.9 V6 BiTurbo","E-Hybrid"]},
+"Skoda":{models:["Octavia Combi","Superb Combi 4x4","Kodiaq"],versions:["Octavia IV (2020–2024)","Octavia III (2012–2020)"],motors:["2.0 TDI (150/200 CV 4x4)","1.5 TSI"]},
+"Seat / Cupra":{models:["Cupra Formentor","Leon Sportstourer"],versions:["Formentor VZ 310 CV","Leon KL (2020–2024)"],motors:["2.0 TSI (310 CV)","1.5 eTSI"]},
+"Toyota":{models:["RAV4 Hybrid","Corolla Touring Sports"],versions:["RAV4 XA50 (2018–2024)","Corolla E210"],motors:["2.5 Hybrid e-CVT (AWD-i)","2.0 Hybrid"]},
+"Tesla":{models:["Model 3","Model Y"],versions:["Long Range Dual Motor","Performance AWD"],motors:["Dual Motor Elétrico"]},
+"Ford":{models:["Focus Turnier","Kuga PHEV"],versions:["Focus Mk4 (2018–2024)","Kuga Mk3"],motors:["2.0 EcoBlue Diesel","2.5 Duratec PHEV"]},
+"Volvo":{models:["XC60 Recharge","V60 Cross Country"],versions:["XC60 II (2017–2024)","V60 II"],motors:["T8 Plug-in Hybrid (455 CV)","B5 AWD"]}
 };
-const starter=[
- {role:"user",text:"meu audi quebrou a mola traseira"},
- {role:"ai",text:"Entendi — no seu Audi A6 3.0 TDI Quattro, então aquele problema que você comentou na traseira era a mola traseira quebrada, e não a bolsa pneumática.\n\n⚠️ Evite rodar assim: principalmente se a mola saiu da posição ou existe uma ponta quebrada encostando perto do pneu. Ela pode danificar componentes próximos.\n\nA mola ainda está presa ou desencaixou do suporte/prato inferior?"},
- {role:"user",text:"sim saiu do suporte"},
- {role:"ai",text:"Aí muda bastante: se a mola traseira saiu do suporte/prato, eu não recomendo continuar rodando com o Audi até verificar, pois há risco de encostar na parte interna da roda.",video:true}
+const audi={brand:"Audi",model:"A6 / S6 / RS6",version:"A6 C7 (2011–2018)",year:"2015",motor:"3.0 TDI V6 Quattro"};
+const initial=[
+{role:"user",text:"meu audi quebrou a mola traseira"},
+{role:"ai",text:"Entendi — no seu Audi A6 3.0 TDI, então aquele problema que você comentou na traseira era a mola traseira quebrada, não bolsa pneumática.\n\nEvite rodar assim, principalmente se a mola saiu da posição ou existe uma ponta quebrada encostando perto do pneu. Ela pode danificar o pneu, amortecedor ou outros componentes. O ideal é trocar a mola e verificar também prato/borracha de apoio e amortecedor."},
+{role:"user",text:"sim saiu do suporte"},
+{role:"ai",alert:"Aí muda bastante: se a mola traseira saiu do suporte/prato, eu não recomendo continuar rodando com o Audi até verificar. A ponta solta de aço pode furar a lateral do pneu ou danificar a tubulação de freio.",video:true}
 ];
 export default function Diagnostico(){
- const [car,setCar]=useState({brand:"Audi",model:"A6",version:"C7 (2011–2018)",year:"2014",motor:"3.0 TDI Quattro"});
- const [msgs,setMsgs]=useState(starter),[input,setInput]=useState(""),[loading,setLoading]=useState(false),[err,setErr]=useState("");
- const active=useMemo(()=>`${car.brand} ${car.model} ${car.version} (${car.year}) • ${car.motor}`,[car]);
- function changeBrand(v){const d=data[v];setCar(c=>({...c,brand:v,model:d.models[0],version:d.versions[0],motor:d.motors[0]}))}
- async function send(q=input){q=q.trim();if(!q||loading)return;const shown={role:"user",text:q};setMsgs(m=>[...m,shown]);setInput("");setLoading(true);setErr("");
-  try{const history=[...msgs,{role:"user",text:`VEÍCULO ATIVO: ${active}. SINTOMA/PERGUNTA: ${q}`}];const r=await fetch("/api/diagnostico",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:history})});const d=await r.json();if(!r.ok)throw new Error(d?.error||"Falha na IA");setMsgs(m=>[...m,{role:"ai",text:d.text}])}catch(e){setErr(e.message||"Erro")}finally{setLoading(false)}
- }
- return <main className="diagnosticMock">
-  <header className="dmHeader"><a href="/" className="dmBrand"><span>T</span><div><b>TOTAL<em>CARS</em>.CH</b><small>Diagnóstico Mecânico Inteligente & Vídeos Integrados</small></div></a><div className="dmHeaderRight"><i><u></u> Sistema Ativo</i><a href="https://wa.me/41790000000" target="_blank">● WhatsApp Oficina</a></div></header>
-  <div className="dmBody"><aside className="dmAside"><div><div className="dmAsideTitle"><b>DADOS DO VEÍCULO</b><button onClick={()=>setCar({brand:"Audi",model:"A6",version:"C7 (2011–2018)",year:"2014",motor:"3.0 TDI Quattro"})}>Carregar Audi A6</button></div>
-   <label>Marca<select value={car.brand} onChange={e=>changeBrand(e.target.value)}>{Object.keys(data).map(x=><option key={x}>{x}</option>)}</select></label>
-   <label>Modelo<select value={car.model} onChange={e=>setCar({...car,model:e.target.value})}>{data[car.brand].models.map(x=><option key={x}>{x}</option>)}</select></label>
-   <label>Geração / Versão<select value={car.version} onChange={e=>setCar({...car,version:e.target.value})}>{data[car.brand].versions.map(x=><option key={x}>{x}</option>)}</select></label>
-   <div className="dmTwo"><label>Ano<select value={car.year} onChange={e=>setCar({...car,year:e.target.value})}>{Array.from({length:31},(_,i)=>2026-i).map(x=><option key={x}>{x}</option>)}</select></label><label>Motor<select value={car.motor} onChange={e=>setCar({...car,motor:e.target.value})}>{data[car.brand].motors.map(x=><option key={x}>{x}</option>)}</select></label></div>
-   <div className="dmActive"><b>🚗 Carro Ativo no Diagnóstico:</b><p>{active}</p></div></div><div className="dmSwiss">🇨🇭 TotalCars - Rheintal / St. Gallen<br/>Inspeção MFK & Peças com certificação ASA</div></aside>
-   <section className="dmChat">{err&&<div className="chatError">⚠ {err}</div>}<div className="dmMessages">{msgs.map((m,i)=><div key={i} className={"dmRow "+m.role}>{m.role==="ai"&&<span className="dmAvatar">TC</span>}<div className="dmBubble"><p>{m.text}</p>{m.video&&<><div className="dmVideo"><div className="dmFrame"><iframe src="https://www.youtube-nocookie.com/embed/fCksnK6c84c" title="Audi A6 Rear Spring Replacement Tutorial" allowFullScreen/></div><div className="dmVideoInfo"><div><b>Audi A6 Quattro (2012–2018) — Troca da Mola Traseira</b><small>Canal: Fixit & Tripit • Passo a passo mecânico</small></div><a href="https://wa.me/41790000000" target="_blank">● Orçar Troca</a></div></div><div className="dmProcedure"><b>💡 Procedimento recomendado na TotalCars:</b><span>• Substituição das 2 molas traseiras (Bilstein / Sachs conforme original).</span><span>• Verificação do calço de borracha inferior e prato superior da suspensão.</span><span>• Estimativa Suíça (CHF): ~CHF 480 - CHF 720 (peças + mão de obra).</span></div></>}</div></div>)}{loading&&<div className="dmRow ai"><span className="dmAvatar">TC</span><div className="dmBubble"><p>Analisando...</p></div></div>}</div>
-   <div className="dmQuick"><b>Perguntas Rápidas:</b>{["Posso guinchar o carro?","Custo da peça na Suíça (CHF)","Reprova na MFK?"].map((x,i)=><button key={x} onClick={()=>send(i===0?"Posso guinchar o carro em vez de andar?":i===1?"Quanto custa a peça e o reparo na Suíça em CHF?":"Isso reprova na inspeção da MFK?")}>{x}</button>)}</div>
-   <form className="dmInput" onSubmit={e=>{e.preventDefault();send()}}><input value={input} onChange={e=>setInput(e.target.value)} placeholder="Digite o sintoma, barulho ou código de erro (ou selecione o carro ao lado)..."/><button disabled={loading}>↑</button><small>TotalCars.ch • O diagnóstico inteligente sugere causas mecânicas e exibe tutoriais no próprio diálogo.</small></form>
-   </section></div>
- </main>
+ const [car,setCar]=useState(audi),[msgs,setMsgs]=useState(initial),[input,setInput]=useState(""),[loading,setLoading]=useState(false),[side,setSide]=useState(false); const end=useRef(null);
+ useEffect(()=>end.current?.scrollIntoView({behavior:"smooth"}),[msgs,loading]);
+ const summary=`${car.brand} ${car.model} (${car.year}) ${car.motor}`;
+ function brand(v){const d=cars[v];setCar({brand:v,model:d.models[0],version:d.versions[0],year:car.year,motor:d.motors[0]})}
+ async function send(q=input){q=q.trim();if(!q||loading)return;setMsgs(m=>[...m,{role:"user",text:q}]);setInput("");setLoading(true);
+ try{const history=[...msgs,{role:"user",text:`Veículo selecionado: ${summary}; geração/versão: ${car.version}. Pergunta do usuário: ${q}`}];const r=await fetch("/api/diagnostico",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:history})});const d=await r.json();if(!r.ok)throw Error(d.error||"Falha na IA");setMsgs(m=>[...m,{role:"ai",text:d.text}])}catch(e){setMsgs(m=>[...m,{role:"ai",alert:e.message||"Erro no diagnóstico."}])}finally{setLoading(false)}}
+ function example(){setCar(audi);setMsgs(initial);setSide(false)}
+ function apply(){send(`Selecionei o meu carro: ${summary}, versão ${car.version}. Como você pode me ajudar?`);setSide(false)}
+ function mic(){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR)return alert("Use Chrome ou Edge para reconhecimento de voz.");const r=new SR();r.lang="pt-BR";r.onresult=e=>{const t=e.results[0][0].transcript;setInput(t);send(t)};r.start()}
+ return <main className="cleanDiag">
+ <header className="cleanHead"><div className="cleanBrand"><button className="mobileMenu" onClick={()=>setSide(!side)}>☰</button><a href="/"><span className="carIcon">🚗</span><div><b>TOTAL<span>CARS</span>.CH</b><small>Oficina Mecânica & Diagnóstico com Vídeo no Chat</small></div><em>🇨🇭 SUÍÇA</em></a></div><div className="headActions"><button onClick={example}>↻ <span>Caso Audi A6</span></button><a href="https://wa.me/41790000000" target="_blank">● Agendar Oficina</a></div></header>
+ <div className="cleanWork">{side&&<div className="sideBackdrop" onClick={()=>setSide(false)}/>}<aside className={side?"cleanSide open":"cleanSide"}><div className="sideTitle">🎚️ <b>Escolha o seu Carro</b><button onClick={()=>setSide(false)}>×</button></div><div className="audiPreset" onClick={example}><strong>⚡ CASO DA FOTO (1 TOQUE) <i>→</i></strong><b>Audi A6 3.0 TDI Quattro</b><small>Mola traseira quebrada fora do prato</small></div><div className="carForm">
+ {["Marca","Modelo","Geração / Versão","Ano","Motor / Tração"].map((lab,i)=><label key={lab}>{lab}: {i===0?<select value={car.brand} onChange={e=>brand(e.target.value)}>{Object.keys(cars).map(x=><option key={x}>{x}</option>)}</select>:i===1?<select value={car.model} onChange={e=>setCar({...car,model:e.target.value})}>{cars[car.brand].models.map(x=><option key={x}>{x}</option>)}</select>:i===2?<select value={car.version} onChange={e=>setCar({...car,version:e.target.value})}>{cars[car.brand].versions.map(x=><option key={x}>{x}</option>)}</select>:i===3?<select value={car.year} onChange={e=>setCar({...car,year:e.target.value})}>{["2022","2020","2018","2016","2015","2014","2013","2012","2010","2008"].map(x=><option key={x}>{x}</option>)}</select>:<select value={car.motor} onChange={e=>setCar({...car,motor:e.target.value})}>{cars[car.brand].motors.map(x=><option key={x}>{x}</option>)}</select>}</label>)}
+ <div className="selectedCard"><small>CARRO SELECIONADO:</small><b>{summary}</b><span>● Pronto para o diagnóstico</span></div><button className="applyCar" onClick={apply}>✓ Consultar Este Carro no Chat</button></div><footer>TotalCars • Suíça <b>CHF</b></footer></aside>
+ <section className="cleanChat"><div className="chatSub"><span>●</span><b>{summary}</b><em>• Suspensão & Diagnóstico</em><button onClick={example}>↻ Reiniciar</button></div><div className="cleanMessages">{msgs.map((m,i)=><div className={"cleanMsg "+m.role} key={i}>{m.role==="ai"&&<span className="wrench">🔧</span>}<div>{m.alert&&<p className="danger">{m.alert}</p>}{m.text&&<p>{m.text}</p>}{m.video&&<><b className="videoTitle">Audi A6 Quattro 2012–2018 — troca da mola traseira quebrada ↗</b><div className="cleanVideo"><iframe src="https://www.youtube-nocookie.com/embed/R9K2m1iO5cI?rel=0&modestbranding=1" title="Audi A6 rear springs" allowFullScreen/></div><div className="estimate"><span>Par de Molas Novas:<b>CHF 140.– a 195.–</b></span><span>Mão de obra oficina:<b>CHF 180.– a 240.–</b></span><span>Teste MFK Suíça:<b>Reprovação grave</b></span></div></>}</div></div>)}{loading&&<div className="cleanMsg ai"><span className="wrench">⚙️</span><div className="typing">Consultando mecânica... <i>● ● ●</i></div></div>}<div ref={end}/></div>
+ <div className="cleanChips"><b>SUGESTÕES:</b>{["🔩 Quebrou a mola traseira","⚠️ Sim, saiu do suporte","🛑 Posso rodar assim?","💰 Preço em CHF"].map((x,i)=><button key={x} onClick={()=>send(["meu audi quebrou a mola traseira","sim saiu do suporte","posso rodar até a oficina com ela quebrada?","quanto custa a troca da mola na Suíça em CHF?"][i])}>{x}</button>)}</div>
+ <div className="cleanInput"><form onSubmit={e=>{e.preventDefault();send()}}><button type="button" className="mic" onClick={mic}>🎙</button><input value={input} onChange={e=>setInput(e.target.value)} placeholder="Digite o defeito, sintoma ou código (ex: mola traseira quebrada, barulho, P0299)..."/><button className="send">↑</button></form><small>TotalCars.ch • Diagnóstico automotivo com vídeo de reparo e orçamento em francos suíços (CHF).</small></div></section></div></main>
 }
