@@ -1,0 +1,16 @@
+name: Atualizar Revista Total Cars
+
+on:
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+
+jobs:
+  aquecer-revista:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Preparar edição mundial no cache
+        run: |
+          curl --fail --silent --show-error --max-time 90 https://totalcars.ch/revista > /dev/null
+          curl --fail --silent --show-error --max-time 90 https://totalcars.ch/api/revista > /dev/null
