@@ -1,42 +1,93 @@
 "use client";
 import {useEffect,useRef,useState} from "react";
+import ui from "./diagnostico.module.css";
 
-const cars={
-"Audi":{models:["A6 / S6 / RS6","A4 / S4 / RS4","A3 / S3","Q5","Q7"],versions:["A6 C7 (2011–2018)","A6 C6 (2004–2011)","A6 C8 (2018–2024)","A4 B9 (2015–2024)","A4 B8 (2008–2015)"],motors:["3.0 TDI V6 Quattro","2.0 TDI (150/190 CV)","2.0 TFSI Turbo","3.0 TFSI Supercharged"]},
-"Volkswagen":{models:["Golf VII / VIII","Passat Variant","Tiguan","Touareg"],versions:["Golf VII (2012–2020)","Passat B8 (2014–2023)","Tiguan II (2016–2024)"],motors:["2.0 TDI (150/190 CV)","2.0 TSI GTI/R","1.4 / 1.5 TSI"]},
-"BMW":{models:["Série 3 (320d/330d)","Série 5 Touring","X3 xDrive","X5 xDrive"],versions:["G20 / G21 Touring (2019–2024)","F30 / F31 Touring (2011–2019)"],motors:["2.0d B47 (320d)","3.0d 6 Cilindros (330d/530d)","2.0 Turbo Gasolina"]},
-"Mercedes-Benz":{models:["Classe C (C220d)","Classe E Station","GLC 4MATIC"],versions:["W205 / S205 (2014–2021)","S213 (2016–2023)"],motors:["2.2 / 2.0 CDI Diesel","3.0 V6 Diesel","2.0 Turbo Gasolina"]},
-"Porsche":{models:["Macan","Cayenne","911 Carrera"],versions:["Macan II (2018–2024)","Cayenne E3 (2017–2024)"],motors:["3.0 V6 Turbo","2.9 V6 BiTurbo","E-Hybrid"]},
-"Skoda":{models:["Octavia Combi","Superb Combi 4x4","Kodiaq"],versions:["Octavia IV (2020–2024)","Octavia III (2012–2020)"],motors:["2.0 TDI (150/200 CV 4x4)","1.5 TSI"]},
-"Seat / Cupra":{models:["Cupra Formentor","Leon Sportstourer"],versions:["Formentor VZ 310 CV","Leon KL (2020–2024)"],motors:["2.0 TSI (310 CV)","1.5 eTSI"]},
-"Toyota":{models:["RAV4 Hybrid","Corolla Touring Sports"],versions:["RAV4 XA50 (2018–2024)","Corolla E210"],motors:["2.5 Hybrid e-CVT (AWD-i)","2.0 Hybrid"]},
-"Tesla":{models:["Model 3","Model Y"],versions:["Long Range Dual Motor","Performance AWD"],motors:["Dual Motor Elétrico"]},
-"Ford":{models:["Focus Turnier","Kuga PHEV"],versions:["Focus Mk4 (2018–2024)","Kuga Mk3"],motors:["2.0 EcoBlue Diesel","2.5 Duratec PHEV"]},
-"Volvo":{models:["XC60 Recharge","V60 Cross Country"],versions:["XC60 II (2017–2024)","V60 II"],motors:["T8 Plug-in Hybrid (455 CV)","B5 AWD"]}
-};
-const audi={brand:"Audi",model:"A6 / S6 / RS6",version:"A6 C7 (2011–2018)",year:"2015",motor:"3.0 TDI V6 Quattro"};
-const initial=[
-{role:"user",text:"meu audi quebrou a mola traseira"},
-{role:"ai",text:"Entendi — no seu Audi A6 3.0 TDI, então aquele problema que você comentou na traseira era a mola traseira quebrada, não bolsa pneumática.\n\nEvite rodar assim, principalmente se a mola saiu da posição ou existe uma ponta quebrada encostando perto do pneu. Ela pode danificar o pneu, amortecedor ou outros componentes. O ideal é trocar a mola e verificar também prato/borracha de apoio e amortecedor."},
-{role:"user",text:"sim saiu do suporte"},
-{role:"ai",alert:"Aí muda bastante: se a mola traseira saiu do suporte/prato, eu não recomendo continuar rodando com o Audi até verificar. A ponta solta de aço pode furar a lateral do pneu ou danificar a tubulação de freio.",video:true}
-];
+const brands=["Audi","BMW","Mercedes-Benz","Volkswagen","Porsche","Skoda","SEAT / Cupra","Toyota","Lexus","Volvo","Ford","Opel","Renault","Peugeot","Citroën","Fiat","Alfa Romeo","Jeep","Land Rover","Jaguar","Nissan","Honda","Mazda","Subaru","Mitsubishi","Hyundai","Kia","Tesla","Polestar","Dacia","Suzuki","MINI","Smart","Ferrari","Lamborghini","Maserati","Outra"];
+const audi={brand:"Audi",model:"A6",version:"C7",year:"2015",motor:"3.0 TDI V6 Quattro",vin:""};
+const welcome={role:"ai",text:"Descreva o defeito do seu carro do seu jeito. Você também pode enviar uma foto ou gravar o barulho. Eu vou organizar as causas possíveis, testes seguros e procurar o vídeo de reparo mais compatível com o seu veículo."};
+
+function Result({m}){
+ const a=m.analysis;if(!a)return null;
+ const u={baixa:ui.low,"média":ui.medium,alta:ui.high,"crítica":ui.critical}[a.urgency]||ui.medium;
+ return <div className={ui.resultShell}>
+  <span className={ui.aiBadge}>✦ TRIAGEM TOTAL CARS AI</span>
+  <div className={ui.resultTop}><p>{a.summary}</p><span className={ui.urgency+" "+u}>{a.urgency||"triagem"}</span></div>
+  {a.warning&&<div className={ui.warning}>⚠️ {a.warning}</div>}
+  {!!a.likely_causes?.length&&<section className={ui.section}><h3>🔎 Causas mais compatíveis</h3><div className={ui.causeGrid}>{a.likely_causes.map((c,i)=><article className={ui.causeCard} key={i}><div className={ui.causeHead}><b>{i+1}. {c.title}</b><span className={ui.confidence}>{c.confidence}</span></div><p>{c.why}</p><span className={ui.check}><b>Como confirmar:</b> {c.check}</span></article>)}</div></section>}
+  {!!a.checks?.length&&<section className={ui.section}><h3>🧪 Ordem de verificação</h3><ol className={ui.list}>{a.checks.map((x,i)=><li key={i}>{x}</li>)}</ol></section>}
+  {a.repair&&<section className={ui.section}><h3>🛠️ Reparação</h3><div className={ui.repairMeta}><div className={ui.pillBox}><small>Dificuldade</small><b>{a.repair.difficulty||"—"}</b></div><div className={ui.pillBox}><small>Peças possíveis</small><div className={ui.tagWrap}>{(a.repair.parts||[]).map((x,i)=><span className={ui.tag} key={i}>{x}</span>)}</div></div></div>{!!a.repair.tools?.length&&<><h3>Ferramentas</h3><div className={ui.tagWrap}>{a.repair.tools.map((x,i)=><span className={ui.tag} key={i}>{x}</span>)}</div></>}{!!a.repair.steps?.length&&<><h3 style={{marginTop:10}}>Passos seguros</h3><ol className={ui.list}>{a.repair.steps.map((x,i)=><li key={i}>{x}</li>)}</ol></>}</section>}
+  <section className={ui.section}><div className={ui.videoHeader}><h3>▶️ Vídeos encontrados para este defeito</h3>{m.youtubeSearchUrl&&<a href={m.youtubeSearchUrl} target="_blank" rel="noreferrer">VER MAIS NO YOUTUBE ↗</a>}</div>
+   {m.videos?.length?<div className={ui.videoGrid}>{m.videos.slice(0,4).map((v,i)=><article className={ui.videoCard} key={v.id}><div className={ui.videoFrame}><iframe src={"https://www.youtube-nocookie.com/embed/"+v.id+"?rel=0&modestbranding=1"} title={v.title} allowFullScreen loading="lazy"/></div><div className={ui.videoInfo}><b>{i===0?"★ Mais relevante — ":""}{v.title}</b><span>{v.channel}</span><a href={"https://www.youtube.com/watch?v="+v.id} target="_blank" rel="noreferrer">Abrir no YouTube ↗</a></div></article>)}</div>:<div className={ui.emptyVideos}>A busca automática do YouTube não retornou vídeos incorporáveis agora. Use a pesquisa preparada abaixo para abrir os resultados diretamente no YouTube.</div>}
+  </section>
+  {!!a.search_terms?.length&&<section className={ui.section}><h3>🌍 Buscas técnicas em vários idiomas</h3>{a.search_terms.map((x,i)=><div className={ui.searchTerm} key={i}>{x}</div>)}</section>}
+  {a.follow_up_question&&<div className={ui.question}>💬 {a.follow_up_question}</div>}
+ </div>
+}
+
 export default function Diagnostico(){
- const [car,setCar]=useState(audi),[msgs,setMsgs]=useState(initial),[input,setInput]=useState(""),[loading,setLoading]=useState(false),[side,setSide]=useState(false); const end=useRef(null);
+ const [car,setCar]=useState(audi),[msgs,setMsgs]=useState([welcome]),[input,setInput]=useState(""),[loading,setLoading]=useState(false),[side,setSide]=useState(false),[recording,setRecording]=useState(false);
+ const end=useRef(null),photoRef=useRef(null),recorderRef=useRef(null),chunksRef=useRef([]);
  useEffect(()=>end.current?.scrollIntoView({behavior:"smooth"}),[msgs,loading]);
- const summary=`${car.brand} ${car.model} (${car.year}) ${car.motor}`;
- function brand(v){const d=cars[v];setCar({brand:v,model:d.models[0],version:d.versions[0],year:car.year,motor:d.motors[0]})}
- async function send(q=input){q=q.trim();if(!q||loading)return;setMsgs(m=>[...m,{role:"user",text:q}]);setInput("");setLoading(true);
- try{const history=[...msgs,{role:"user",text:`Veículo selecionado: ${summary}; geração/versão: ${car.version}. Pergunta do usuário: ${q}`}];const r=await fetch("/api/diagnostico",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:history})});const d=await r.json();if(!r.ok)throw Error(d.error||"Falha na IA");setMsgs(m=>[...m,{role:"ai",text:d.text}])}catch(e){setMsgs(m=>[...m,{role:"ai",alert:e.message||"Erro no diagnóstico."}])}finally{setLoading(false)}}
- function example(){setCar(audi);setMsgs(initial);setSide(false)}
- function apply(){send(`Selecionei o meu carro: ${summary}, versão ${car.version}. Como você pode me ajudar?`);setSide(false)}
- function mic(){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR)return alert("Use Chrome ou Edge para reconhecimento de voz.");const r=new SR();r.lang="pt-BR";r.onresult=e=>{const t=e.results[0][0].transcript;setInput(t);send(t)};r.start()}
+ const summary=[car.brand,car.model,car.version,car.year,car.motor].filter(Boolean).join(" • ");
+
+ async function send(q=input,media=null){
+  q=(q||"").trim();if((!q&&!media)||loading)return;
+  const prefix=media?.kind==="audio"?"🎧 Barulho do veículo enviado":media?.kind==="image"?"📷 Foto do veículo enviada":"";
+  const shown=[prefix,q].filter(Boolean).join("\n");
+  const next=[...msgs,{role:"user",text:shown}];
+  setMsgs(next);setInput("");setLoading(true);
+  try{
+   const history=next.map(x=>({role:x.role,text:x.text||x.analysis?.summary||""}));
+   const r=await fetch("/api/diagnostico",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:history,vehicle:car,media})});
+   const d=await r.json();if(!r.ok)throw Error(d.error||"Falha na IA");
+   setMsgs(m=>[...m,{role:"ai",text:d.analysis?.summary||"Análise concluída.",analysis:d.analysis,videos:d.videos||[],youtubeSearchUrl:d.youtubeSearchUrl||""}]);
+  }catch(e){setMsgs(m=>[...m,{role:"ai",alert:e.message||"Erro no diagnóstico."}])}finally{setLoading(false)}
+ }
+
+ function reset(){setMsgs([welcome]);setInput("");setSide(false)}
+ function apply(){send("Use estes dados como o meu veículo e me diga que tipos de problema você consegue diagnosticar.");setSide(false)}
+ function mic(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR)return alert("Use Chrome ou Edge para ditado por voz.");
+  const r=new SR();r.lang="pt-BR";r.onresult=e=>setInput(e.results[0][0].transcript);r.start();
+ }
+ function fileToData(file,kind){
+  if(file.size>12*1024*1024)return alert("Arquivo muito grande. Use até 12 MB.");
+  const reader=new FileReader();
+  reader.onload=()=>send(kind==="image"?"Analise esta foto junto com os dados do meu carro. Diga o que é visível, possíveis defeitos e como confirmar.":"Analise este barulho do meu carro e diga quais fontes são compatíveis e como testar.",{kind,mimeType:file.type||(kind==="audio"?"audio/webm":"image/jpeg"),data:reader.result});
+  reader.readAsDataURL(file);
+ }
+ async function recordSound(){
+  if(recording){recorderRef.current?.stop();return}
+  if(!navigator.mediaDevices?.getUserMedia||!window.MediaRecorder)return alert("Seu navegador não permite gravação de áudio aqui.");
+  try{
+   const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+   const mime=MediaRecorder.isTypeSupported("audio/webm;codecs=opus")?"audio/webm;codecs=opus":"audio/webm";
+   const rec=new MediaRecorder(stream,{mimeType:mime});chunksRef.current=[];recorderRef.current=rec;
+   rec.ondataavailable=e=>{if(e.data.size)chunksRef.current.push(e.data)};
+   rec.onstop=()=>{setRecording(false);stream.getTracks().forEach(t=>t.stop());const blob=new Blob(chunksRef.current,{type:rec.mimeType||"audio/webm"});fileToData(blob,"audio")};
+   rec.start();setRecording(true);setTimeout(()=>{if(rec.state==="recording")rec.stop()},12000);
+  }catch{setRecording(false);alert("Não consegui acessar o microfone. Verifique a permissão do navegador.")}
+ }
+
  return <main className="cleanDiag">
- <header className="cleanHead"><div className="cleanBrand"><button className="mobileMenu" onClick={()=>setSide(!side)}>☰</button><a href="/"><span className="carIcon">🚗</span><div><b>TOTAL<span>CARS</span>.CH</b><small>Oficina Mecânica & Diagnóstico com Vídeo no Chat</small></div><em>🇨🇭 SUÍÇA</em></a></div><div className="headActions"><button onClick={example}>↻ <span>Caso Audi A6</span></button><a href="https://wa.me/41790000000" target="_blank">● Agendar Oficina</a></div></header>
- <div className="cleanWork">{side&&<div className="sideBackdrop" onClick={()=>setSide(false)}/>}<aside className={side?"cleanSide open":"cleanSide"}><div className="sideTitle">🎚️ <b>Escolha o seu Carro</b><button onClick={()=>setSide(false)}>×</button></div><div className="audiPreset" onClick={example}><strong>⚡ CASO DA FOTO (1 TOQUE) <i>→</i></strong><b>Audi A6 3.0 TDI Quattro</b><small>Mola traseira quebrada fora do prato</small></div><div className="carForm">
- {["Marca","Modelo","Geração / Versão","Ano","Motor / Tração"].map((lab,i)=><label key={lab}>{lab}: {i===0?<select value={car.brand} onChange={e=>brand(e.target.value)}>{Object.keys(cars).map(x=><option key={x}>{x}</option>)}</select>:i===1?<select value={car.model} onChange={e=>setCar({...car,model:e.target.value})}>{cars[car.brand].models.map(x=><option key={x}>{x}</option>)}</select>:i===2?<select value={car.version} onChange={e=>setCar({...car,version:e.target.value})}>{cars[car.brand].versions.map(x=><option key={x}>{x}</option>)}</select>:i===3?<select value={car.year} onChange={e=>setCar({...car,year:e.target.value})}>{["2022","2020","2018","2016","2015","2014","2013","2012","2010","2008"].map(x=><option key={x}>{x}</option>)}</select>:<select value={car.motor} onChange={e=>setCar({...car,motor:e.target.value})}>{cars[car.brand].motors.map(x=><option key={x}>{x}</option>)}</select>}</label>)}
- <div className="selectedCard"><small>CARRO SELECIONADO:</small><b>{summary}</b><span>● Pronto para o diagnóstico</span></div><button className="applyCar" onClick={apply}>✓ Consultar Este Carro no Chat</button></div><footer>TotalCars • Suíça <b>CHF</b></footer></aside>
- <section className="cleanChat"><div className="chatSub"><span>●</span><b>{summary}</b><em>• Suspensão & Diagnóstico</em><button onClick={example}>↻ Reiniciar</button></div><div className="cleanMessages">{msgs.map((m,i)=><div className={"cleanMsg "+m.role} key={i}>{m.role==="ai"&&<span className="wrench">🔧</span>}<div>{m.alert&&<p className="danger">{m.alert}</p>}{m.text&&<p>{m.text}</p>}{m.video&&<><b className="videoTitle">Audi A6 Quattro 2012–2018 — troca da mola traseira quebrada ↗</b><div className="cleanVideo"><iframe src="https://www.youtube-nocookie.com/embed/R9K2m1iO5cI?rel=0&modestbranding=1" title="Audi A6 rear springs" allowFullScreen/></div><div className="estimate"><span>Par de Molas Novas:<b>CHF 140.– a 195.–</b></span><span>Mão de obra oficina:<b>CHF 180.– a 240.–</b></span><span>Teste MFK Suíça:<b>Reprovação grave</b></span></div></>}</div></div>)}{loading&&<div className="cleanMsg ai"><span className="wrench">⚙️</span><div className="typing">Consultando mecânica... <i>● ● ●</i></div></div>}<div ref={end}/></div>
- <div className="cleanChips"><b>SUGESTÕES:</b>{["🔩 Quebrou a mola traseira","⚠️ Sim, saiu do suporte","🛑 Posso rodar assim?","💰 Preço em CHF"].map((x,i)=><button key={x} onClick={()=>send(["meu audi quebrou a mola traseira","sim saiu do suporte","posso rodar até a oficina com ela quebrada?","quanto custa a troca da mola na Suíça em CHF?"][i])}>{x}</button>)}</div>
- <div className="cleanInput"><form onSubmit={e=>{e.preventDefault();send()}}><button type="button" className="mic" onClick={mic}>🎙</button><input value={input} onChange={e=>setInput(e.target.value)} placeholder="Digite o defeito, sintoma ou código (ex: mola traseira quebrada, barulho, P0299)..."/><button className="send">↑</button></form><small>TotalCars.ch • Diagnóstico automotivo com vídeo de reparo e orçamento em francos suíços (CHF).</small></div></section></div></main>
+  <header className="cleanHead"><div className="cleanBrand"><button className="mobileMenu" onClick={()=>setSide(!side)}>☰</button><a href="/"><span className="carIcon">🚗</span><div><b>TOTAL<span>CARS</span>.CH</b><small>Diagnóstico inteligente • foto • barulho • vídeo de reparo</small></div><em>🇨🇭 SUÍÇA</em></a></div><div className="headActions"><button onClick={reset}>↻ <span>Novo diagnóstico</span></button><a href="/oficinas">● Encontrar Oficina</a></div></header>
+  <div className="cleanWork">{side&&<div className="sideBackdrop" onClick={()=>setSide(false)}/>}<aside className={side?"cleanSide open":"cleanSide"}><div className="sideTitle">🎚️ <b>Identifique o veículo</b><button onClick={()=>setSide(false)}>×</button></div>
+   <div className="carForm">
+    <label>Marca:<select value={car.brand} onChange={e=>setCar({...car,brand:e.target.value})}>{brands.map(x=><option key={x}>{x}</option>)}</select></label>
+    <label>Modelo:<input className={ui.fieldInput} value={car.model} onChange={e=>setCar({...car,model:e.target.value})} placeholder="Ex.: A6"/></label>
+    <label>Geração / versão:<input className={ui.fieldInput} value={car.version} onChange={e=>setCar({...car,version:e.target.value})} placeholder="Ex.: C7 / 4G"/></label>
+    <label>Ano:<input className={ui.fieldInput} value={car.year} onChange={e=>setCar({...car,year:e.target.value})} inputMode="numeric" placeholder="Ex.: 2015"/></label>
+    <label>Motor / tração:<input className={ui.fieldInput} value={car.motor} onChange={e=>setCar({...car,motor:e.target.value})} placeholder="Ex.: 3.0 TDI Quattro"/></label>
+    <label>VIN opcional:<input className={ui.fieldInput} value={car.vin} maxLength={17} onChange={e=>setCar({...car,vin:e.target.value.toUpperCase()})} placeholder="17 caracteres"/></label>
+    <div className="selectedCard"><small>VEÍCULO ATUAL:</small><b>{summary||"Preencha os dados"}</b><span>● IA usa estes dados para refinar diagnóstico e vídeos</span></div><button className="applyCar" onClick={apply}>✓ Usar este veículo</button>
+   </div><footer>TotalCars • Suíça <b>AI + VIDEO</b></footer>
+  </aside>
+  <section className="cleanChat"><div className="chatSub"><span>●</span><b>{summary||"Veículo não definido"}</b><em>• Diagnóstico multimodal</em><button onClick={reset}>↻ Reiniciar</button></div>
+   <div className="cleanMessages">{msgs.map((m,i)=><div className={"cleanMsg "+m.role} key={i}>{m.role==="ai"&&<span className="wrench">🔧</span>}<div>{m.alert&&<p className="danger">{m.alert}</p>}{m.analysis?<Result m={m}/>:m.text&&<p>{m.text}</p>}</div></div>)}{loading&&<div className="cleanMsg ai"><span className="wrench">⚙️</span><div className="typing">Analisando sintomas e procurando vídeos... <i>● ● ●</i></div></div>}<div ref={end}/></div>
+   <div className="cleanChips"><b>EXEMPLOS:</b>{["🔊 Barulho ao ligar","⚠️ Luz do motor","🛑 Vibra ao frear","🐌 Perde força"].map((x,i)=><button key={x} onClick={()=>send(["faz um barulho metálico quando liga e depois para","acendeu a luz do motor no painel","o carro vibra quando eu piso no freio","o carro perdeu força principalmente em subida"][i])}>{x}</button>)}</div>
+   <div className={ui.mediaTools}><button onClick={()=>photoRef.current?.click()}>📷 Enviar foto</button><button onClick={recordSound} className={recording?ui.recording:""}>{recording?"⏹ Parar gravação":"🎧 Gravar barulho (12s)"}</button><small>IA analisa imagem e som junto com o veículo</small><input ref={photoRef} type="file" accept="image/*" capture="environment" hidden onChange={e=>{const f=e.target.files?.[0];if(f)fileToData(f,"image");e.target.value=""}}/></div>
+   <div className="cleanInput"><form onSubmit={e=>{e.preventDefault();send()}}><button type="button" className="mic" onClick={mic}>🎙</button><input value={input} onChange={e=>setInput(e.target.value)} placeholder="Descreva o defeito, sintoma ou código OBD..."/><button className="send">↑</button></form><small>TotalCars.ch • Triagem remota não substitui inspeção presencial em sistemas críticos.</small></div>
+  </section></div>
+ </main>
 }
