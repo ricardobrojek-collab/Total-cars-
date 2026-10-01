@@ -1,6 +1,20 @@
-"use client";import {useEffect,useState} from "react";
-const fallback=[{category:"TOTAL CARS",title:"Revista Total Cars",sub:"Notícias automotivas reais, organizadas por IA",body:"A edição automática está sendo atualizada. As matérias usam fontes públicas e mantêm o link da fonte para conferência.",sourceUrl:""}];
-export default function Revista(){const [articles,setArticles]=useState(fallback),[p,setP]=useState(0),[loading,setLoading]=useState(true);
- useEffect(()=>{fetch("/api/revista").then(r=>r.json()).then(d=>{if(d.articles?.length)setArticles(d.articles)}).finally(()=>setLoading(false))},[]);
- const a=articles[p]||articles[0];
- return <main className="magPage"><header className="magHeader"><a href="/" className="premiumLogo"><span>TOTAL</span> CARS<em>.CH</em></a><nav><button onClick={()=>setP(Math.max(0,p-1))}>← ANTERIOR</button><b>{p+1} / {articles.length}</b><button onClick={()=>setP(Math.min(articles.length-1,p+1))}>PRÓXIMA →</button></nav></header><section className="magStage"><div className={"magSheet "+(p%2?"turn":"")}><div className="magImage magGenerated"><span>{a.category||"ATUALIDADE"}</span><div><h1>{a.title}</h1><h2>{a.sub}</h2></div></div><div className="magCopy"><span>{loading?"ATUALIZANDO EDIÇÃO...":"REVISTA TOTAL CARS · CONTEÚDO ATUAL"}</span><p>{a.body}</p><div className="magColumns"><p>Conteúdo reescrito em linguagem editorial própria a partir de fontes públicas. Informações importantes devem ser conferidas na publicação original.</p><p>As imagens da revista serão próprias, geradas ou provenientes de fontes com permissão de uso; não copiamos fotografias protegidas de outros veículos.</p></div>{a.sourceUrl&&<a className="sourceLink" href={a.sourceUrl} target="_blank" rel="noreferrer">VER FONTE ORIGINAL ↗</a>}</div></div><div className="magHint">Clique em PRÓXIMA para folhear →</div></section><section className="magTopics"><b>ÚLTIMAS</b><span>LANÇAMENTOS</span><span>TESTES</span><span>COMPARATIVOS</span><span>SUÍÇA</span><span>CHINA</span><span>ELÉTRICOS</span><span>SUPERCARROS</span><span>SERVIÇO</span></section></main>}
+"use client";
+import {useEffect,useMemo,useState} from "react";
+const sections=["CAPA","ÍNDICE","MUNDO","SUÍÇA","LANÇAMENTOS","CHINA & ÁSIA","ELÉTRICOS","SUPERCARROS","TECNOLOGIA","TESTES","MERCADO","CLÁSSICOS","MECÂNICA","EVENTOS"];
+export default function Revista(){
+ const [edition,setEdition]=useState(null),[p,setP]=useState(0),[open,setOpen]=useState(false);
+ useEffect(()=>{fetch("/api/revista",{cache:"no-store"}).then(r=>r.json()).then(d=>setEdition(d)).catch(()=>{})},[]);
+ const pages=edition?.pages||[]; const page=pages[p]; const pct=pages.length?Math.round((p+1)/pages.length*100):0;
+ const grouped=useMemo(()=>sections.map(s=>[s,pages.filter(x=>x.section===s)]).filter(x=>x[1].length),[pages]);
+ const go=n=>setP(Math.max(0,Math.min(pages.length-1,n)));
+ return <main className="paperMagazine">
+  <header className="paperTop"><a href="/" className="premiumLogo"><span>TOTAL</span> CARS<em>.CH</em></a><div><b>EDIÇÃO {edition?.edition||"—"}</b><span>{edition?.updatedLabel||"Carregando edição..."}</span></div><button onClick={()=>setOpen(!open)}>☰ ÍNDICE</button></header>
+  {open&&<aside className="paperIndex"><button onClick={()=>setOpen(false)}>FECHAR ×</button><h2>ÍNDICE</h2>{grouped.map(([s,arr])=><div key={s}><b>{s}</b>{arr.slice(0,8).map(x=><button key={x.page} onClick={()=>{go(x.page-1);setOpen(false)}}>{String(x.page).padStart(2,"0")} {x.title}</button>)}</div>)}</aside>}
+  {!page?<section className="paperLoading"><h1>REVISTA TOTAL CARS</h1><p>Abrindo a edição já preparada...</p></section>:
+  <section className={"paperSpread "+(page.type||"article")}>
+   <div className="paperVisual" style={page.image?{backgroundImage:`linear-gradient(0deg,#050505aa,#05050510),url("${page.image}")`}:{}}><span>{page.section}</span><div><small>PÁGINA {String(page.page).padStart(2,"0")}</small><h1>{page.title}</h1><h2>{page.subtitle}</h2></div></div>
+   <article className="paperArticle"><header><span>TOTAL CARS · {page.section}</span><b>{edition?.issueDate}</b></header><h1>{page.headline||page.title}</h1>{page.deck&&<h2>{page.deck}</h2>}<div className="paperColumns">{(page.paragraphs||[]).map((x,i)=><p key={i}>{x}</p>)}</div>{page.highlights?.length>0&&<div className="paperHighlights">{page.highlights.map(x=><span key={x}>{x}</span>)}</div>}{page.sourceUrl&&<a href={page.sourceUrl} target="_blank" rel="noreferrer">FONTE ORIGINAL ↗</a>}<footer>REVISTA TOTAL CARS · {page.page}</footer></article>
+  </section>}
+  <nav className="paperControls"><button disabled={p===0} onClick={()=>go(p-1)}>← ANTERIOR</button><div><b>{p+1} / {pages.length||"—"}</b><span><i style={{width:pct+"%"}}/></span></div><button disabled={!pages.length||p===pages.length-1} onClick={()=>go(p+1)}>PRÓXIMA →</button></nav>
+ </main>
+}
