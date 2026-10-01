@@ -1,6 +1,21 @@
-"use client";import {useEffect,useState} from "react";
-const fallback=[{category:"TOTAL CARS",title:"Revista Total Cars",sub:"Notícias automotivas reais, organizadas por IA",body:"A edição automática está sendo atualizada. As matérias usam fontes públicas e mantêm o link da fonte para conferência.",sourceUrl:""}];
-export default function Revista(){const [articles,setArticles]=useState(fallback),[p,setP]=useState(0),[loading,setLoading]=useState(true);
- useEffect(()=>{fetch("/api/revista").then(r=>r.json()).then(d=>{if(d.articles?.length)setArticles(d.articles)}).finally(()=>setLoading(false))},[]);
- const a=articles[p]||articles[0];
- return <main className="magPage"><header className="magHeader"><a href="/" className="premiumLogo"><span>TOTAL</span> CARS<em>.CH</em></a><nav><button onClick={()=>setP(Math.max(0,p-1))}>← ANTERIOR</button><b>{p+1} / {articles.length}</b><button onClick={()=>setP(Math.min(articles.length-1,p+1))}>PRÓXIMA →</button></nav></header><section className="magStage"><div className={"magSheet "+(p%2?"turn":"")}><div className="magImage magGenerated"><span>{a.category||"ATUALIDADE"}</span><div><h1>{a.title}</h1><h2>{a.sub}</h2></div></div><div className="magCopy"><span>{loading?"ATUALIZANDO EDIÇÃO...":"REVISTA TOTAL CARS · CONTEÚDO ATUAL"}</span><p>{a.body}</p><div className="magColumns"><p>Conteúdo reescrito em linguagem editorial própria a partir de fontes públicas. Informações importantes devem ser conferidas na publicação original.</p><p>As imagens da revista serão próprias, geradas ou provenientes de fontes com permissão de uso; não copiamos fotografias protegidas de outros veículos.</p></div>{a.sourceUrl&&<a className="sourceLink" href={a.sourceUrl} target="_blank" rel="noreferrer">VER FONTE ORIGINAL ↗</a>}</div></div><div className="magHint">Clique em PRÓXIMA para folhear →</div></section><section className="magTopics"><b>ÚLTIMAS</b><span>LANÇAMENTOS</span><span>TESTES</span><span>COMPARATIVOS</span><span>SUÍÇA</span><span>CHINA</span><span>ELÉTRICOS</span><span>SUPERCARROS</span><span>SERVIÇO</span></section></main>}
+import MagazineClient from "./MagazineClient";
+import { buildMagazine } from "../../lib/revista";
+
+export const revalidate = 1800;
+
+export const metadata = {
+  title: "Revista Total Cars | Notícias automotivas do mundo",
+  description: "China, Europa, elétricos, tecnologia, lançamentos, mercado, testes, curiosidades e supercarros em uma revista automotiva global."
+};
+
+export default async function RevistaPage() {
+  let initialData = { articles: [], sourceCount: 0, updatedAt: new Date().toISOString() };
+
+  try {
+    initialData = await buildMagazine();
+  } catch (error) {
+    console.error("revista page", error);
+  }
+
+  return <MagazineClient initialData={initialData} />;
+}
