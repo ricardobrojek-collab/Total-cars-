@@ -24,7 +24,7 @@ function tokens(q="") {
 }
 
 async function searchYouTube(query) {
-  const key = process.env.YOUTUBE_API_KEY || process.env.GOOGLE_API_KEY || process.env.GEMINI_API_KEY;
+  const key = process.env.YOUTUBE_API_KEY || process.env.GOOGLE_API_KEY;
   if (!key || !query) return [];
   try {
     const p = new URLSearchParams({
@@ -90,10 +90,12 @@ export async function POST(request) {
       vehicle.vin ? "VIN "+vehicle.vin : ""
     ].filter(Boolean).join(" | ");
 
-    const history=messages.slice(-16).filter(m=>m&&typeof m.text==="string").map(m=>({
+    let history=messages.slice(-16).filter(m=>m&&typeof m.text==="string"&&m.text.trim()).map(m=>({
       role:m.role==="user"?"user":"model",
-      parts:[{text:m.text}]
+      parts:[{text:m.text.trim()}]
     }));
+    // Gemini conversations must start with a real user turn. Ignore UI welcome/model messages.
+    while(history.length && history[0].role!=="user") history.shift();
     if(!history.length && !media) return Response.json({error:"Escreva uma mensagem para iniciar."},{status:400});
 
     if (media?.data && media?.mimeType) {
