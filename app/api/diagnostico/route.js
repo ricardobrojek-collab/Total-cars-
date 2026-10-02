@@ -1,4 +1,11 @@
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
+export async function GET(){
+  const gemini=Boolean(process.env.GEMINI_API_KEY);
+  const youtube=Boolean(process.env.YOUTUBE_API_KEY || process.env.GOOGLE_API_KEY);
+  return Response.json({ok:gemini,gemini,youtube,diagnosis:gemini?"ready":"missing_key",videos:youtube?"ready":"optional_unavailable"},{headers:{"Cache-Control":"no-store"}});
+}
 
 function cleanJson(text="") {
   try { return JSON.parse(text); } catch {}
