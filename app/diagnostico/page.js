@@ -34,8 +34,7 @@ export default function Diagnostico(){
  async function send(q=input,media=null){
   q=(q||"").trim();if((!q&&!media)||loading)return;
   const prefix=media?.kind==="audio"?"🎧 Barulho do veículo enviado":media?.kind==="image"?"📷 Foto do veículo enviada":"";
-  const shown=[prefix,q].filter(Boolean).join("
-");
+  const shown=[prefix,q].filter(Boolean).join("\n");
   const next=[...msgs,{role:"user",text:shown}];
   setMsgs(next);setInput("");setLoading(true);
   try{
