@@ -1,55 +1,13 @@
-import { NextResponse } from "next/server";
-
-const LANGS = new Set(["pt","de","fr","it","en","es"]);
-function clean(v="",max=80){return String(v).trim().slice(0,max).replace(/[<>]/g,"");}
-async function wdSearch(q,lang){
- const p=new URLSearchParams({action:"wbsearchentities",search:q,language:lang,uselang:lang,format:"json",origin:"*",limit:"30",type:"item"});
- const r=await fetch("https://www.wikidata.org/w/api.php?"+p,{headers:{"User-Agent":"TotalCarsSwitzerland/2.0 (info@totalcars.ch)"},next:{revalidate:86400}});
- if(!r.ok) throw Error("Wikidata search "+r.status);
- return (await r.json()).search||[];
-}
-async function entities(ids,lang){
- if(!ids.length)return {};
- const p=new URLSearchParams({action:"wbgetentities",ids:ids.join("|"),props:"labels|descriptions|claims|sitelinks",languages:lang+"|en|de|pt",format:"json",origin:"*"});
- const r=await fetch("https://www.wikidata.org/w/api.php?"+p,{headers:{"User-Agent":"TotalCarsSwitzerland/2.0 (info@totalcars.ch)"},next:{revalidate:86400}});
- if(!r.ok) throw Error("Wikidata entities "+r.status);
- return (await r.json()).entities||{};
-}
-function claimId(e,p){return e?.claims?.[p]?.[0]?.mainsnak?.datavalue?.value?.id||""}
-function claimIds(e,p){return (e?.claims?.[p]||[]).map(x=>x?.mainsnak?.datavalue?.value?.id).filter(Boolean)}
-function claimText(e,p){const v=e?.claims?.[p]?.[0]?.mainsnak?.datavalue?.value;return typeof v==="string"?v:""}
-function claimYear(e,p){const t=e?.claims?.[p]?.[0]?.mainsnak?.datavalue?.value?.time;const m=t?.match(/[+-](\d{4})-/);return m?m[1]:""}
-function commonsUrl(name){if(!name)return"";return "https://commons.wikimedia.org/wiki/Special:Redirect/file/"+encodeURIComponent(name.replace(/ /g,"_"))}
-function label(e,lang){return e?.labels?.[lang]?.value||e?.labels?.en?.value||e?.labels?.de?.value||e?.labels?.pt?.value||""}
-
-export async function GET(request){
- const {searchParams}=new URL(request.url);
- const q=clean(searchParams.get("q")||"");
- const lang=LANGS.has(searchParams.get("lang"))?searchParams.get("lang"):"pt";
- if(q.length<2)return NextResponse.json({success:false,cars:[],error:"Digite pelo menos 2 caracteres."},{status:400});
- try{
-  const found=await wdSearch(q,lang);
-  const raw=await entities(found.map(x=>x.id),lang);
-  const makerIds=[...new Set(Object.values(raw).flatMap(e=>claimIds(e,"P176")))].slice(0,30);
-  const makers=await entities(makerIds,lang);
-  const cars=found.map(hit=>{
-    const e=raw[hit.id]; if(!e)return null;
-    const desc=(e.descriptions?.[lang]?.value||e.descriptions?.en?.value||hit.description||"").toLowerCase();
-    const types=claimIds(e,"P31");
-    const image=claimText(e,"P18");
-    const manufacturer=claimId(e,"P176");
-    const automotive=/car|automobile|vehicle|motor|voiture|automóvil|automóvel|auto|fahrzeug|wagen|coupé|sedan|suv|roadster|hatchback|pickup|van/.test(desc) || !!manufacturer || !!image;
-    if(!automotive)return null;
-    return {
-      id:hit.id,name:label(e,lang)||hit.label,description:e.descriptions?.[lang]?.value||e.descriptions?.en?.value||hit.description||"",
-      manufacturer:manufacturer?label(makers[manufacturer],lang):"",
-      imageUrl:commonsUrl(image),
-      startYear:claimYear(e,"P571")||claimYear(e,"P577"),
-      endYear:claimYear(e,"P576"),
-      types,
-      wikidata:"https://www.wikidata.org/wiki/"+hit.id
-    };
-  }).filter(Boolean);
-  return NextResponse.json({success:true,query:q,count:cars.length,cars,source:"Wikidata/Wikimedia"});
- }catch(e){console.error("world-cars",e);return NextResponse.json({success:false,cars:[],error:"Não foi possível consultar o catálogo mundial agora."},{status:502})}
-}
+import {NextResponse} from "next/server";
+const LANGS=new Set(["pt","de","fr","it","en","es"]);
+const clean=(v="",n=80)=>String(v).trim().slice(0,n).replace(/[<>]/g,"");
+async function search(q,lang,limit=50){const p=new URLSearchParams({action:"wbsearchentities",search:q,language:lang,uselang:lang,format:"json",origin:"*",limit:String(limit),type:"item"});const r=await fetch("https://www.wikidata.org/w/api.php?"+p,{headers:{"User-Agent":"TotalCarsSwitzerland/3.0 (info@totalcars.ch)"},next:{revalidate:86400}});if(!r.ok)throw Error("search "+r.status);return (await r.json()).search||[]}
+async function get(ids,lang){if(!ids.length)return{};const p=new URLSearchParams({action:"wbgetentities",ids:ids.slice(0,50).join("|"),props:"labels|descriptions|claims|sitelinks",languages:lang+"|en|de|pt",format:"json",origin:"*"});const r=await fetch("https://www.wikidata.org/w/api.php?"+p,{headers:{"User-Agent":"TotalCarsSwitzerland/3.0 (info@totalcars.ch)"},next:{revalidate:86400}});if(!r.ok)throw Error("entities "+r.status);return (await r.json()).entities||{}}
+const ids=(e,p)=>(e?.claims?.[p]||[]).map(x=>x?.mainsnak?.datavalue?.value?.id).filter(Boolean);
+const id=(e,p)=>ids(e,p)[0]||"";
+const str=(e,p)=>{const v=e?.claims?.[p]?.[0]?.mainsnak?.datavalue?.value;return typeof v==="string"?v:""};
+const year=(e,p)=>{const t=e?.claims?.[p]?.[0]?.mainsnak?.datavalue?.value?.time||"";return (t.match(/[+-](\\d{4})-/)||[])[1]||""};
+const label=(e,l)=>e?.labels?.[l]?.value||e?.labels?.en?.value||e?.labels?.de?.value||e?.labels?.pt?.value||"";
+const img=n=>n?"https://commons.wikimedia.org/wiki/Special:Redirect/file/"+encodeURIComponent(n.replace(/ /g,"_")):"";
+export async function GET(req){const u=new URL(req.url),brand=clean(u.searchParams.get("brand")||""),model=clean(u.searchParams.get("model")||""),lang=LANGS.has(u.searchParams.get("lang"))?u.searchParams.get("lang"):"pt";if(!brand)return NextResponse.json({success:false,error:"Escolha uma marca."},{status:400});
+try{const term=model?brand+" "+model:brand;const hits=await search(term,lang,50);const es=await get(hits.map(x=>x.id),lang);const makerIds=[...new Set(Object.values(es).flatMap(e=>ids(e,"P176")))];const makers=await get(makerIds,lang);const items=hits.map(h=>{const e=es[h.id];if(!e)return null;const d=e.descriptions?.[lang]?.value||e.descriptions?.en?.value||h.description||"";const maker=id(e,"P176"),makerName=label(makers[maker],lang);const automotive=makerName.toLowerCase().includes(brand.toLowerCase())||d.toLowerCase().match(/car|automobile|vehicle|voiture|automóvel|auto|fahrzeug|wagen|suv|sedan|coupé|roadster/);if(!automotive)return null;return{id:h.id,name:label(e,lang)||h.label,description:d,manufacturer:makerName,imageUrl:img(str(e,"P18")),startYear:year(e,"P571"),endYear:year(e,"P576"),country:id(e,"P17"),article:e.sitelinks?.[lang+"wiki"]?.title||e.sitelinks?.enwiki?.title||""}}).filter(Boolean);return NextResponse.json({success:true,brand,model,count:items.length,items});}catch(e){console.error(e);return NextResponse.json({success:false,error:"Fonte histórica indisponível agora.",items:[]},{status:502})}}
