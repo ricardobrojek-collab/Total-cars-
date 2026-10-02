@@ -27,13 +27,15 @@ function Result({m}){
 export default function Diagnostico(){
  const [car,setCar]=useState(audi),[msgs,setMsgs]=useState([welcome]),[input,setInput]=useState(""),[loading,setLoading]=useState(false),[side,setSide]=useState(false),[recording,setRecording]=useState(false),[health,setHealth]=useState(null);
  const end=useRef(null),photoRef=useRef(null),recorderRef=useRef(null),chunksRef=useRef([]);
- useEffect(()=>end.current?.scrollIntoView({behavior:"smooth"}),[msgs,loading]);\n useEffect(()=>{fetch("/api/diagnostico",{cache:"no-store"}).then(r=>r.json()).then(setHealth).catch(()=>setHealth({ok:false,gemini:false,youtube:false}))},[]);
+ useEffect(()=>end.current?.scrollIntoView({behavior:"smooth"}),[msgs,loading]);
+ useEffect(()=>{fetch("/api/diagnostico",{cache:"no-store"}).then(r=>r.json()).then(setHealth).catch(()=>setHealth({ok:false,gemini:false,youtube:false}))},[]);
  const summary=[car.brand,car.model,car.version,car.year,car.motor].filter(Boolean).join(" • ");
 
  async function send(q=input,media=null){
   q=(q||"").trim();if((!q&&!media)||loading)return;
   const prefix=media?.kind==="audio"?"🎧 Barulho do veículo enviado":media?.kind==="image"?"📷 Foto do veículo enviada":"";
-  const shown=[prefix,q].filter(Boolean).join("\n");
+  const shown=[prefix,q].filter(Boolean).join("
+");
   const next=[...msgs,{role:"user",text:shown}];
   setMsgs(next);setInput("");setLoading(true);
   try{
