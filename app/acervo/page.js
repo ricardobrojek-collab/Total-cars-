@@ -1,25 +1,20 @@
 "use client";
-import {useState} from "react";
-
+import {useEffect,useState} from "react";
+const makes=["Audi","BMW","Mercedes-Benz","Volkswagen","Porsche","Toyota","Lexus","Honda","Nissan","Mazda","Subaru","Mitsubishi","Ford","Chevrolet","Cadillac","Dodge","Jeep","Chrysler","Volvo","Saab","Renault","Peugeot","Citroën","Fiat","Alfa Romeo","Lancia","Ferrari","Lamborghini","Maserati","Bentley","Rolls-Royce","Aston Martin","McLaren","Lotus","Jaguar","Land Rover","MINI","Škoda","SEAT","Cupra","Opel","Dacia","Hyundai","Kia","Genesis","Suzuki","Isuzu","Tesla","Polestar","BYD","Geely","NIO","XPeng","Hongqi","Chery","Great Wall","MG","Rivian","Lucid"];
 export default function Acervo(){
- const [q,setQ]=useState("Porsche"),[cars,setCars]=useState([]),[loading,setLoading]=useState(false),[error,setError]=useState("");
- async function search(e){e?.preventDefault();setLoading(true);setError("");try{const r=await fetch("/api/car-history?q="+encodeURIComponent(q));const d=await r.json();if(!r.ok)throw Error(d.error||"Falha na busca");setCars(d.cars||[])}catch(e){setError(e.message)}finally{setLoading(false)}}
- return <main style={{maxWidth:1180,margin:"0 auto",padding:"32px 20px",fontFamily:"Arial,sans-serif"}}>
-  <a href="/" style={{textDecoration:"none",color:"inherit"}}>← TOTALCARS.CH</a>
-  <h1 style={{fontSize:"clamp(32px,5vw,64px)",marginBottom:8}}>Acervo Automotivo</h1>
-  <p style={{fontSize:18,color:"#555"}}>Pesquise marcas e modelos e explore veículos e imagens de referência do acervo aberto Wikidata/Wikimedia.</p>
-  <form onSubmit={search} style={{display:"flex",gap:10,margin:"28px 0",flexWrap:"wrap"}}>
-   <input value={q} onChange={e=>setQ(e.target.value)} placeholder="Ex.: Porsche 911, Audi A6, BMW M3" style={{flex:"1 1 300px",padding:16,border:"1px solid #bbb",borderRadius:12,fontSize:16}}/>
-   <button disabled={loading} style={{padding:"16px 24px",border:0,borderRadius:12,fontWeight:800,cursor:"pointer"}}>{loading?"Buscando...":"Pesquisar"}</button>
-  </form>
-  {error&&<p>{error}</p>}
-  {!loading&&!cars.length&&!error&&<div style={{padding:"40px 0",color:"#666"}}>Faça uma pesquisa para abrir o acervo.</div>}
-  <section style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(240px,1fr))",gap:18}}>
-   {cars.map(car=><article key={car.id} style={{border:"1px solid #ddd",borderRadius:18,overflow:"hidden",background:"#fff"}}>
-    <img src={car.imageUrl} alt={car.name} style={{width:"100%",height:180,objectFit:"cover",display:"block"}}/>
-    <div style={{padding:16}}><h2 style={{fontSize:18,margin:"0 0 6px"}}>{car.name}</h2><span style={{color:"#666"}}>{car.year||"Ano não confirmado"}</span></div>
-   </article>)}
-  </section>
-  <p style={{marginTop:28,fontSize:13,color:"#777"}}>Imagens e metadados vêm de fontes abertas. O ano exibido é informativo e não substitui a identificação exata de geração/versão do veículo.</p>
+ const [q,setQ]=useState(""),[cars,setCars]=useState([]),[loading,setLoading]=useState(false),[error,setError]=useState("");
+ async function search(term=q){term=term.trim();if(term.length<2)return;setQ(term);setLoading(true);setError("");try{const r=await fetch("/api/car-history?q="+encodeURIComponent(term)+"&lang=pt");const d=await r.json();if(!r.ok)throw Error(d.error||"Falha na busca");setCars(d.cars||[])}catch(e){setError(e.message)}finally{setLoading(false)}}
+ return <main style={{maxWidth:1240,margin:"0 auto",padding:"28px 20px 60px",fontFamily:"Arial,sans-serif",color:"#111"}}>
+  <a href="/" style={{textDecoration:"none",color:"inherit",fontWeight:800}}>← TOTALCARS.CH</a>
+  <div style={{margin:"28px 0 20px"}}><small style={{fontWeight:900,letterSpacing:2}}>TODOS OS CARROS</small><h1 style={{fontSize:"clamp(38px,6vw,72px)",margin:"5px 0 10px",lineHeight:.95}}>Catálogo Mundial</h1><p style={{fontSize:18,maxWidth:760,color:"#555"}}>Explore fabricantes, modelos históricos e atuais. Pesquise marca, modelo ou geração. O catálogo usa dados abertos e nunca inventa um veículo que a fonte não confirmou.</p></div>
+  <form onSubmit={e=>{e.preventDefault();search()}} style={{display:"flex",gap:10,margin:"24px 0",flexWrap:"wrap"}}><input value={q} onChange={e=>setQ(e.target.value)} placeholder="Ex.: Audi A6, Porsche 911, Toyota Supra..." style={{flex:"1 1 360px",padding:17,border:"1px solid #bbb",borderRadius:12,fontSize:17}}/><button disabled={loading} style={{padding:"16px 28px",border:0,borderRadius:12,fontWeight:900,cursor:"pointer"}}>{loading?"BUSCANDO...":"PESQUISAR"}</button></form>
+  <section style={{margin:"24px 0 34px"}}><h2 style={{fontSize:18}}>Marcas do mundo</h2><div style={{display:"flex",gap:8,flexWrap:"wrap"}}>{makes.map(x=><button key={x} onClick={()=>search(x)} style={{padding:"9px 13px",border:"1px solid #ddd",background:"#fff",borderRadius:999,cursor:"pointer"}}>{x}</button>)}</div></section>
+  {error&&<p style={{padding:18,background:"#fee"}}>{error}</p>}
+  {!loading&&cars.length===0&&!error&&<div style={{padding:"36px 0",color:"#666"}}>Escolha uma marca ou pesquise um modelo para começar.</div>}
+  <section style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(255px,1fr))",gap:18}}>{cars.map(car=><article key={car.id} style={{border:"1px solid #ddd",borderRadius:18,overflow:"hidden",background:"#fff",boxShadow:"0 6px 20px #0000000c"}}>
+   {car.imageUrl?<img src={car.imageUrl} alt={car.name} style={{width:"100%",height:190,objectFit:"cover",display:"block"}}/>:<div style={{height:190,display:"grid",placeItems:"center",background:"#f1f1f1",fontSize:48}}>🚘</div>}
+   <div style={{padding:16}}><small style={{color:"#777"}}>{car.manufacturer||"Fabricante não confirmado"}</small><h2 style={{fontSize:20,margin:"5px 0"}}>{car.name}</h2>{car.description&&<p style={{fontSize:14,color:"#555",minHeight:34}}>{car.description}</p>}<div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:8}}><span>{car.startYear?car.startYear+(car.endYear?"–"+car.endYear:""):"Período não confirmado"}</span><a href={"/diagnostico?car="+encodeURIComponent(car.name)} style={{fontWeight:800}}>DIAGNÓSTICO →</a></div></div>
+  </article>)}</section>
+  <p style={{marginTop:30,fontSize:13,color:"#777"}}>Fonte inicial: Wikidata/Wikimedia. Ausência de um modelo ou imagem significa que ele ainda não foi confirmado nesta fonte; o Total Cars não substitui dados faltantes por conteúdo inventado.</p>
  </main>
 }
