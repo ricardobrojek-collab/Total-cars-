@@ -12,8 +12,8 @@ export default function Home(){
 const [lang,setLang]=useState("pt");
 const [visitors,setVisitors]=useState(null);
 const [magazine,setMagazine]=useState([]);
-useEffect(()=>{const l=localStorage.getItem("tc_lang");if(copy[l])setLang(l); const seen=localStorage.getItem("tc_visitor_seen"); fetch("/api/visitors",{method:seen?"GET":"POST"}).then(x=>x.json()).then(d=>{if(typeof d.count==="number")setVisitors(d.count);if(!seen)localStorage.setItem("tc_visitor_seen","1")}).catch(()=>{}); fetch("/api/revista").then(x=>x.json()).then(d=>setMagazine(Array.isArray(d.articles)?d.articles.slice(0,7):[])).catch(()=>{});},[]);
-const setLanguage=l=>{setLang(l);localStorage.setItem("tc_lang",l)};
+useEffect(()=>{const l=localStorage.getItem("tc_lang");if(copy[l])setLang(l); const seen=localStorage.getItem("tc_visitor_seen"); fetch("/api/visitors",{method:seen?"GET":"POST"}).then(x=>x.json()).then(d=>{if(typeof d.count==="number")setVisitors(d.count);if(!seen)localStorage.setItem("tc_visitor_seen","1")}).catch(()=>{}); fetch("/api/revista?lang="+encodeURIComponent(l||"pt")).then(x=>x.json()).then(d=>setMagazine(Array.isArray(d.articles)?d.articles.slice(0,7):[])).catch(()=>{});},[]);
+const setLanguage=l=>{setLang(l);localStorage.setItem("tc_lang",l);fetch("/api/revista?lang="+encodeURIComponent(l)).then(x=>x.json()).then(d=>setMagazine(Array.isArray(d.articles)?d.articles.slice(0,7):[])).catch(()=>{})};
 const magUi={
 pt:{label:"REVISTA TOTAL CARS",title:"As matérias que estão movimentando o mundo automotivo.",all:"VER REVISTA COMPLETA →",read:"LER MATÉRIA →",loading:"Carregando as matérias mais recentes…"},
 de:{label:"TOTAL CARS MAGAZIN",title:"Die Themen, die die Autowelt bewegen.",all:"GANZES MAGAZIN ANSEHEN →",read:"ARTIKEL LESEN →",loading:"Aktuelle Artikel werden geladen…"},
