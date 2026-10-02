@@ -25,9 +25,9 @@ function Result({m}){
 }
 
 export default function Diagnostico(){
- const [car,setCar]=useState(audi),[msgs,setMsgs]=useState([welcome]),[input,setInput]=useState(""),[loading,setLoading]=useState(false),[side,setSide]=useState(false),[recording,setRecording]=useState(false);
+ const [car,setCar]=useState(audi),[msgs,setMsgs]=useState([welcome]),[input,setInput]=useState(""),[loading,setLoading]=useState(false),[side,setSide]=useState(false),[recording,setRecording]=useState(false),[health,setHealth]=useState(null);
  const end=useRef(null),photoRef=useRef(null),recorderRef=useRef(null),chunksRef=useRef([]);
- useEffect(()=>end.current?.scrollIntoView({behavior:"smooth"}),[msgs,loading]);
+ useEffect(()=>end.current?.scrollIntoView({behavior:"smooth"}),[msgs,loading]);\n useEffect(()=>{fetch("/api/diagnostico",{cache:"no-store"}).then(r=>r.json()).then(setHealth).catch(()=>setHealth({ok:false,gemini:false,youtube:false}))},[]);
  const summary=[car.brand,car.model,car.version,car.year,car.motor].filter(Boolean).join(" • ");
 
  async function send(q=input,media=null){
@@ -71,7 +71,7 @@ export default function Diagnostico(){
  }
 
  return <main className="cleanDiag">
-  <header className="cleanHead"><div className="cleanBrand"><button className="mobileMenu" onClick={()=>setSide(!side)}>☰</button><a href="/"><span className="carIcon">🚗</span><div><b>TOTAL<span>CARS</span>.CH</b><small>Diagnóstico inteligente • foto • barulho • vídeo de reparo</small></div><em>🇨🇭 SUÍÇA</em></a></div><div className="headActions"><button onClick={reset}>↻ <span>Novo diagnóstico</span></button><a href="/oficinas">● Encontrar Oficina</a></div></header>
+  <header className="cleanHead"><div className="cleanBrand"><button className="mobileMenu" onClick={()=>setSide(!side)}>☰</button><a href="/"><span className="carIcon">🚗</span><div><b>TOTAL<span>CARS</span>.CH</b><small>Diagnóstico inteligente • foto • barulho • vídeo de reparo</small>{health&&<span style={{fontSize:10,marginLeft:8,color:health.gemini?"#35c46a":"#ff5b43"}}>{health.gemini?"● IA ONLINE":"● IA INDISPONÍVEL"}{health.youtube?" · VÍDEOS ONLINE":" · VÍDEOS OPCIONAIS OFF"}</span>}</div><em>🇨🇭 SUÍÇA</em></a></div><div className="headActions"><button onClick={reset}>↻ <span>Novo diagnóstico</span></button><a href="/oficinas">● Encontrar Oficina</a></div></header>
   <div className="cleanWork">{side&&<div className="sideBackdrop" onClick={()=>setSide(false)}/>}<aside className={side?"cleanSide open":"cleanSide"}><div className="sideTitle">🎚️ <b>Identifique o veículo</b><button onClick={()=>setSide(false)}>×</button></div>
    <div className="carForm">
     <label>Marca:<select value={car.brand} onChange={e=>setCar({...car,brand:e.target.value})}>{brands.map(x=><option key={x}>{x}</option>)}</select></label>
