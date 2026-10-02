@@ -221,3 +221,31 @@
  .magTeaser{min-height:520px!important;padding:50px 5vw!important}
 }
 @media(max-width:560px){.tc>.heroDock{grid-template-columns:1fr!important}}
+
+
+/* 2026-10-02: raise hero search so it does not cover the headline */
+@media (min-width:901px){
+ .referenceHero .heroSearchWrap{
+   position:absolute!important;
+   top:78px!important;
+   left:50%!important;
+   transform:translateX(-18%)!important;
+   width:min(900px,62vw)!important;
+   max-width:min(900px,62vw)!important;
+   margin:0!important;
+   z-index:14!important;
+ }
+ .referenceHero .premiumSearch{
+   margin:0!important;
+   width:100%!important;
+   max-width:100%!important;
+ }
+}
+@media (min-width:901px) and (max-width:1250px){
+ .referenceHero .heroSearchWrap{
+   top:72px!important;
+   left:47%!important;
+   transform:none!important;
+   width:50vw!important;
+ }
+}
