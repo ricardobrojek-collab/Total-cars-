@@ -124,3 +124,26 @@
  .referenceHero .premiumSearch{grid-template-columns:1fr}
  .referenceHero .heroDock{position:relative;left:auto;right:auto;bottom:auto;margin-top:24px;grid-template-columns:1fr}
 }
+
+
+/* 2026-10-02 definitive desktop hero reset */
+@media (min-width:901px){
+ .referenceHero{height:820px!important;min-height:820px!important;max-height:none!important;overflow:hidden!important;background-position:62% center!important}
+ .referenceHero .premiumHeroContent{position:relative!important;z-index:5!important;max-width:none!important;padding:52px 4vw 180px!important}
+ .referenceHero .heroKicker{display:block!important}
+ .referenceHero h1{position:relative!important;z-index:5!important;width:620px!important;max-width:620px!important;font-size:68px!important;line-height:.88!important;margin:18px 0 14px!important}
+ .referenceHero .premiumHeroContent>p{position:relative!important;width:620px!important;max-width:620px!important;margin:0 0 20px!important;font-size:17px!important;line-height:1.4!important}
+ .referenceHero .heroSearchWrap{position:relative!important;z-index:10!important;width:900px!important;max-width:calc(100vw - 8vw)!important;margin:0!important}
+ .referenceHero .premiumSearch{position:relative!important;width:900px!important;max-width:100%!important;margin:20px 0 0!important;grid-template-columns:190px minmax(260px,1fr) 180px 170px!important}
+ .referenceHero .premiumSearch select,.referenceHero .premiumSearch input{min-width:0!important;padding:17px 15px!important}
+ .referenceHero .premiumSearch a{min-width:0!important;padding:17px 16px!important}
+ .referenceHero .heroLinks{margin:12px 0 0 8px!important}
+ .referenceHero .heroDock{position:absolute!important;left:2vw!important;right:2vw!important;bottom:22px!important;z-index:12!important;display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:12px!important}
+ .referenceHero .heroDock>a{min-width:0!important;min-height:108px!important;margin:0!important}
+}
+@media (min-width:901px) and (max-width:1250px){
+ .referenceHero h1{font-size:58px!important;width:560px!important}
+ .referenceHero .premiumHeroContent>p{width:560px!important}
+ .referenceHero .heroSearchWrap,.referenceHero .premiumSearch{width:820px!important}
+ .referenceHero .premiumSearch{grid-template-columns:165px minmax(220px,1fr) 155px 150px!important}
+}
