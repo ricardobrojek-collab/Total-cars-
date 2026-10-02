@@ -249,3 +249,16 @@
    width:50vw!important;
  }
 }
+
+
+/* 2026-10-02 fine tune: search higher + further right */
+@media (min-width:1251px){
+ .referenceHero .heroSearchWrap{
+   top:42px!important;
+   left:auto!important;
+   right:4.5vw!important;
+   transform:none!important;
+   width:min(820px,55vw)!important;
+   max-width:min(820px,55vw)!important;
+ }
+}
