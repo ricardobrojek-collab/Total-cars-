@@ -262,3 +262,6 @@
    max-width:min(820px,55vw)!important;
  }
 }
+
+.visitorNumber{position:absolute;top:7px;right:12px;color:#fff;font:800 11px/1 Arial,sans-serif;letter-spacing:.5px;opacity:.78;z-index:50;pointer-events:none}
+.premiumTop{position:relative}
